@@ -9,7 +9,10 @@ namespace SalserosAttendance.Models
     public class AttendanceRecord
     {
         public int AttendanceRecordID { get; set; }
+        
+        [DataType(DataType.Date)]
         public DateTime Date { get; set; }
+
         public List<Member> Members { get; set; }
     }
 }

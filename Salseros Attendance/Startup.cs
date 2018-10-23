@@ -21,8 +21,8 @@ namespace SalserosAttendance
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-            services.AddDbContext<RDA1Context>(options =>
-                    options.UseSqlServer(Configuration.GetConnectionString("RDA1Context")));
+            services.AddDbContext<Data.SalserosAttendanceContext>(options =>
+                    options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
