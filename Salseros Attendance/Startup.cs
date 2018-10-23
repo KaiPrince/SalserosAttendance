@@ -4,8 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.EntityFrameworkCore;
 
-namespace Salseros_Attendance
+namespace SalserosAttendance
 {
     public class Startup
     {
@@ -20,6 +21,8 @@ namespace Salseros_Attendance
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddDbContext<RDA1Context>(options =>
+                    options.UseSqlServer(Configuration.GetConnectionString("RDA1Context")));
 
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
