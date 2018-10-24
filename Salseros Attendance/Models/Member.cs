@@ -21,7 +21,7 @@ namespace SalserosAttendance.Models
         public string CollegeEmail { get; set; }
 
         [Phone]
-        public int PhoneNumber { get; set; }
+        public string PhoneNumber { get; set; }
 
         [EmailAddress]
         public string ContactEmail { get; set; }
