@@ -45,6 +45,7 @@ namespace Salseros_Attendance.Controllers
             }
 
             return Ok(member);
+            //TODO: return a JSON string with only needed properties (name, email)
         }
 
         // PUT: api/Members/5

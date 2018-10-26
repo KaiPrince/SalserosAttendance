@@ -38,19 +38,45 @@ namespace SalserosAttendance.Data
                         CollegeEmail = "kprince2807@conestogac.on.ca",
                         PhoneNumber = "289-981-2006",
                         ContactEmail = "kaiprince72@gmail.com"
+                    },
+                    new Member
+                    {
+                        FirstName = "Tyler",
+                        LastName = "Myles",
+                        StudentNumber = 1234567,
+                        CollegeEmail = "tmyles4567@conestogac.on.ca",
                     }
                     );
                 }
 
+                if (!context.Events.Any())
+                {
+                    context.Events.AddRange(
+                        new Event
+                        {
+                            Title = "Salsa Lesson",
+                        },
+                        new Event
+                        {
+                            Title = "Halloween Party",
+                            Date = DateTime.Parse("Oct 31, 2018").Date,
+                        }
+                        );
+                }
+
                 if (!context.AttendanceRecords.Any())
                 {
-                    context.AttendanceRecords.AddRange(
+                    foreach (var member in context.Members)
+                    {
+                        context.AttendanceRecords.AddRange(
                                 new AttendanceRecord
                                 {
-                                    Date = DateTime.Now.Date,
-                                    Members = context.Members.ToList(),
+                                    Event = context.Events.First(),
+                                    Member = member,
                                 }
-                            );
+                         );
+                    }
+
                 }
 
                 context.SaveChanges();

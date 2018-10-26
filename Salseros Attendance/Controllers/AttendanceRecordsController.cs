@@ -21,13 +21,49 @@ namespace Salseros_Attendance.Controllers
             _context = context;
         }
 
-        // GET: api/AttendanceRecords
+        /// <summary>
+        /// Get today's attendance record.
+        /// </summary>
+        /// <returns>IEnumerable</returns>
+        //[HttpGet("[action]")]
         [HttpGet]
-        public IEnumerable<AttendanceRecord> GetAttendanceRecords()
+        public IEnumerable<Member> GetToday()
         {
-            return _context.AttendanceRecords;
+            //TODO: change this to return a list of ints, members, or a single attendance record
+            //TODO change name or return type.
+            //TODO: change return type to minimize amount of data sent.
+            //IEnumerable<Member> todayRecord = _context.Events.Where(x => x.Date == DateTime.Now.Date).SelectMany(x => x.AttendanceRecords.Select(y => y.Member));
+
+            //Get today's eventID
+            Event todayEvent = _context.Events.Where(x => x.Date == DateTime.Now.Date).SingleOrDefault();
+            //  TODO: change this to use ID integer only, for optimized processing
+
+            //... or Create Event
+            if (todayEvent == null)
+            {
+                todayEvent = new Event()
+                {
+                    Date = DateTime.Now.Date,
+                    Title = "Salsa Lesson",
+                };
+                _context.Add(todayEvent);
+                _context.SaveChanges();
+            }
+
+            //Get Attending Members
+            IEnumerable<Member> attendingMembers = _context.AttendanceRecords.Where(x => x.Event == todayEvent).Select(x => x.Member);
+            
+            return attendingMembers;
         }
 
+        // GET: api/AttendanceRecords
+        [HttpGet("all")]
+        public IEnumerable<AttendanceRecord> GetAttendanceRecords()
+        {
+            return _context.AttendanceRecords.ToList();
+        }
+
+        /*
         // GET: api/AttendanceRecords/5
         [HttpGet("{id}")]
         public async Task<IActionResult> GetAttendanceRecord([FromRoute] int id)
@@ -81,10 +117,11 @@ namespace Salseros_Attendance.Controllers
 
             return NoContent();
         }
+        
 
         // POST: api/AttendanceRecords
         [HttpPost]
-        public async Task<IActionResult> PostAttendanceRecord([FromBody] AttendanceRecord attendanceRecord)
+        public async Task<IActionResult> PostAttendanceRecord([FromBody] Event attendanceRecord)
         {
             if (!ModelState.IsValid)
             {
@@ -122,5 +159,6 @@ namespace Salseros_Attendance.Controllers
         {
             return _context.AttendanceRecords.Any(e => e.AttendanceRecordID == id);
         }
+        */
     }
 }

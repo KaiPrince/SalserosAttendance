@@ -25,5 +25,8 @@ namespace SalserosAttendance.Models
 
         [EmailAddress]
         public string ContactEmail { get; set; }
+
+
+        public ICollection<AttendanceRecord> AttendanceRecords { get; set; }
     }
 }

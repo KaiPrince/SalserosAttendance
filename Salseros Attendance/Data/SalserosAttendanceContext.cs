@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using SalserosAttendance.Models;
 
 namespace SalserosAttendance.Data
 {
@@ -15,7 +16,24 @@ namespace SalserosAttendance.Data
 
         }
 
-        public DbSet<SalserosAttendance.Models.Member> Members { get; set; } 
-        public DbSet<SalserosAttendance.Models.AttendanceRecord> AttendanceRecords { get; set; }
+        public DbSet<Member> Members { get; set; } 
+        public DbSet<Event> Events { get; set; }
+        public DbSet<AttendanceRecord> AttendanceRecords { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<AttendanceRecord>()
+                .HasKey(x => new { x.EventID, x.MemberID });
+
+            modelBuilder.Entity<AttendanceRecord>()
+                .HasOne(x => x.Event)
+                .WithMany(x => x.AttendanceRecords)
+                .HasForeignKey(x => x.EventID);
+
+            modelBuilder.Entity<AttendanceRecord>()
+                .HasOne(x => x.Member)
+                .WithMany(x => x.AttendanceRecords)
+                .HasForeignKey(x => x.MemberID);
+        }
     }
 }

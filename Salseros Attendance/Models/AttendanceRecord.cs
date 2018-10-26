@@ -8,11 +8,14 @@ namespace SalserosAttendance.Models
 {
     public class AttendanceRecord
     {
-        public int AttendanceRecordID { get; set; }
-        
-        [DataType(DataType.Date)]
-        public DateTime Date { get; set; }
+        public AttendanceRecord()
+        {
+        }
 
-        public List<Member> Members { get; set; }
+        public int EventID { get; set; }
+        public Event Event { get; set; }
+        
+        public int MemberID { get; set; }
+        public Member Member { get; set; }
     }
 }
