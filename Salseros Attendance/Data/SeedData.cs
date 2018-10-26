@@ -71,7 +71,9 @@ namespace SalserosAttendance.Data
                         context.AttendanceRecords.AddRange(
                                 new AttendanceRecord
                                 {
+                                    EventID = context.Events.First().EventID,
                                     Event = context.Events.First(),
+                                    MemberID = member.MemberID,
                                     Member = member,
                                 }
                          );

@@ -9,16 +9,17 @@ namespace SalserosAttendance.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "AttendanceRecords",
+                name: "Events",
                 columns: table => new
                 {
-                    AttendanceRecordID = table.Column<int>(nullable: false)
+                    EventID = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    Title = table.Column<string>(nullable: true),
                     Date = table.Column<DateTime>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AttendanceRecords", x => x.AttendanceRecordID);
+                    table.PrimaryKey("PK_Events", x => x.EventID);
                 });
 
             migrationBuilder.CreateTable(
@@ -32,33 +33,53 @@ namespace SalserosAttendance.Migrations
                     StudentNumber = table.Column<int>(maxLength: 7, nullable: false),
                     CollegeEmail = table.Column<string>(nullable: true),
                     PhoneNumber = table.Column<string>(nullable: true),
-                    ContactEmail = table.Column<string>(nullable: true),
-                    AttendanceRecordID = table.Column<int>(nullable: true)
+                    ContactEmail = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Members", x => x.MemberID);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AttendanceRecords",
+                columns: table => new
+                {
+                    EventID = table.Column<int>(nullable: false),
+                    MemberID = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AttendanceRecords", x => new { x.EventID, x.MemberID });
                     table.ForeignKey(
-                        name: "FK_Members_AttendanceRecords_AttendanceRecordID",
-                        column: x => x.AttendanceRecordID,
-                        principalTable: "AttendanceRecords",
-                        principalColumn: "AttendanceRecordID",
-                        onDelete: ReferentialAction.Restrict);
+                        name: "FK_AttendanceRecords_Events_EventID",
+                        column: x => x.EventID,
+                        principalTable: "Events",
+                        principalColumn: "EventID",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_AttendanceRecords_Members_MemberID",
+                        column: x => x.MemberID,
+                        principalTable: "Members",
+                        principalColumn: "MemberID",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Members_AttendanceRecordID",
-                table: "Members",
-                column: "AttendanceRecordID");
+                name: "IX_AttendanceRecords_MemberID",
+                table: "AttendanceRecords",
+                column: "MemberID");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Members");
+                name: "AttendanceRecords");
 
             migrationBuilder.DropTable(
-                name: "AttendanceRecords");
+                name: "Events");
+
+            migrationBuilder.DropTable(
+                name: "Members");
         }
     }
 }

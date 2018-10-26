@@ -10,13 +10,17 @@ namespace SalserosAttendance.Models
     {
         public int MemberID { get; set; }
         
+        //TODO: Add Name validation here using regex
+        [Required]
         public string FirstName { get; set; }
 
+        [Required]
         public string LastName { get; set; }
 
         [MaxLength(7)]
         public int StudentNumber { get; set; }
 
+        //TODO: Make this required?
         [EmailAddress]
         public string CollegeEmail { get; set; }
 

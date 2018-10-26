@@ -10,7 +10,7 @@ using SalserosAttendance.Data;
 namespace SalserosAttendance.Migrations
 {
     [DbContext(typeof(SalserosAttendanceContext))]
-    [Migration("20181024192932_Initial")]
+    [Migration("20181026023657_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -23,15 +23,30 @@ namespace SalserosAttendance.Migrations
 
             modelBuilder.Entity("SalserosAttendance.Models.AttendanceRecord", b =>
                 {
-                    b.Property<int>("AttendanceRecordID")
+                    b.Property<int>("EventID");
+
+                    b.Property<int>("MemberID");
+
+                    b.HasKey("EventID", "MemberID");
+
+                    b.HasIndex("MemberID");
+
+                    b.ToTable("AttendanceRecords");
+                });
+
+            modelBuilder.Entity("SalserosAttendance.Models.Event", b =>
+                {
+                    b.Property<int>("EventID")
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<DateTime>("Date");
 
-                    b.HasKey("AttendanceRecordID");
+                    b.Property<string>("Title");
 
-                    b.ToTable("AttendanceRecords");
+                    b.HasKey("EventID");
+
+                    b.ToTable("Events");
                 });
 
             modelBuilder.Entity("SalserosAttendance.Models.Member", b =>
@@ -39,8 +54,6 @@ namespace SalserosAttendance.Migrations
                     b.Property<int>("MemberID")
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int?>("AttendanceRecordID");
 
                     b.Property<string>("CollegeEmail");
 
@@ -57,16 +70,20 @@ namespace SalserosAttendance.Migrations
 
                     b.HasKey("MemberID");
 
-                    b.HasIndex("AttendanceRecordID");
-
                     b.ToTable("Members");
                 });
 
-            modelBuilder.Entity("SalserosAttendance.Models.Member", b =>
+            modelBuilder.Entity("SalserosAttendance.Models.AttendanceRecord", b =>
                 {
-                    b.HasOne("SalserosAttendance.Models.AttendanceRecord")
-                        .WithMany("Members")
-                        .HasForeignKey("AttendanceRecordID");
+                    b.HasOne("SalserosAttendance.Models.Event", "Event")
+                        .WithMany("AttendanceRecords")
+                        .HasForeignKey("EventID")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("SalserosAttendance.Models.Member", "Member")
+                        .WithMany("AttendanceRecords")
+                        .HasForeignKey("MemberID")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618
         }
