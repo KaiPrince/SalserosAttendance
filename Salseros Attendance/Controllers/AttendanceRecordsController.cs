@@ -35,8 +35,22 @@ namespace Salseros_Attendance.Controllers
             //IEnumerable<Member> todayRecord = _context.Events.Where(x => x.Date == DateTime.Now.Date).SelectMany(x => x.AttendanceRecords.Select(y => y.Member));
 
             //Get today's eventID
-            Event todayEvent = _context.Events.Where(x => x.Date == DateTime.Now.Date).SingleOrDefault();
+            Event todayEvent;
+            var allTodayEvents = _context.Events.Where(x => x.Date == DateTime.Now.Date);
+            try
+            {
+                todayEvent = allTodayEvents.SingleOrDefault();
+            }
+            catch (InvalidOperationException)
+            {
+                //If there is more than one event on the same day, we will simply use the last (newest) one
+                todayEvent = allTodayEvents.LastOrDefault();
+                //TODO: change this to just use LastOrDefault on the first try instead of two statements.
+            }
             //  TODO: change this to use ID integer only, for optimized processing
+
+            //TODO: for testing only, we will hardcode the first event, until we finish crud functionality
+            todayEvent = _context.Events.FirstOrDefault();
 
             //... or Create Event
             if (todayEvent == null)
