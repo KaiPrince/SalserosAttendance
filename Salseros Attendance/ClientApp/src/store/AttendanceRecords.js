@@ -6,7 +6,8 @@ const initialState = { records: [], isLoading: false };
 
 export const actionCreators = {
     requestAttendanceRecords: () => async (dispatch, getState) => {
-        if (undefined !== getState().attendance.records.attendanceRecordID) {
+        if (0 !== getState().attendance.records.length) {
+            //TODO: change this so it updates in real-time to changes in DB
             // Don't issue a duplicate request (we already have or are loading the requested data)
             return;
         }

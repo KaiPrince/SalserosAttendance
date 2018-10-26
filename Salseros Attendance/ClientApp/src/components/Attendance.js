@@ -1,8 +1,8 @@
 ﻿import React, { Component } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { Link } from 'react-router-dom';
 import { actionCreators } from '../store/AttendanceRecords';
+import SearchBar from './SearchBar';
 
 class Attendance extends Component {
     componentWillMount() {
@@ -19,11 +19,13 @@ class Attendance extends Component {
         this.props.requestAttendanceRecords();
     }
 
+    //TODO: Add search bar
     render() {
         return (
             <div>
                 <h1>Salseros Atten-dance</h1>
-                
+
+                <SearchBar />
                 {renderRecordsTable(this.props)}
             </div>
         );
@@ -31,6 +33,7 @@ class Attendance extends Component {
 }
 
 function renderRecordsTable(props) {
+    //TODO: remove this and refactor
     var members = props.records.members;
     if (members === undefined) {
         members = props.records;
