@@ -30,6 +30,7 @@ class FetchData extends Component {
 }
 
 function renderForecastsTable(props) {
+    
   return (
     <table className='table'>
       <thead>
