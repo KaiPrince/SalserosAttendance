@@ -21,6 +21,30 @@ namespace Salseros_Attendance.Controllers
             _context = context;
         }
 
+        [HttpPut("[action]/{id}")]
+        public async Task<IActionResult> attendTodayEvent([FromRoute] int id)
+        {//TODO: change this to take an EventID instead
+            Event todayEvent = _context.Events.FirstOrDefault();//_context.Events.Where(x => x.Date == DateTime.Now.Date).LastOrDefault();
+            if (todayEvent == null)
+            {
+                //TODO create event
+            }
+            
+            var attendanceRecord = new AttendanceRecord
+            {
+                EventID = todayEvent.EventID,
+                Event = todayEvent,
+                MemberID = id,
+                Member = await _context.Members.FindAsync(id),
+            };
+
+            //TODO: don't allow duplicate adding of members
+            await _context.AttendanceRecords.AddAsync(attendanceRecord);
+            await _context.SaveChangesAsync();
+
+            return Ok();
+        }
+
         // GET: api/Members
         [HttpGet]
         public IEnumerable<Member> GetMembers()

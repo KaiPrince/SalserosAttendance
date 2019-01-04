@@ -14,12 +14,11 @@ class Attendance extends Component {
 
     componentWillReceiveProps(nextProps) {
         // This method runs when incoming props (e.g., route params) change
-
+        
         //const startDateIndex = parseInt(nextProps.match.params.startDateIndex, 10) || 0;
         this.props.requestAttendanceRecords();
     }
-
-    //TODO: Add search bar
+    
     render() {
         return (
             <div>
