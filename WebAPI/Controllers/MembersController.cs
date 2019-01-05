@@ -9,20 +9,44 @@ using System.Diagnostics;
 using System.Web.Http.Cors;
 using System.IO;
 using WebAPI.Models;
+using System.Data.SqlClient;
+using System.Data;
 
 namespace WebAPI.Controllers
 {
 	[EnableCors(origins: "*", headers: "*", methods: "*")]
 	public class MembersController : ApiController
 	{
-		List<Member> members;
+		List<Member> members = new List<Member>();
 		public MembersController()
 		{
-			members = new List<Member>
+
+			const string query = @"SELECT * FROM Members;";
+
+			using (var myConn = new SqlConnection(Support.connectionString))
 			{
-				new Member { MemberID = 1, FirstName = "Kai", LastName = "Prince", StudentNumber = 7952807 },
-				new Member {MemberID = 2, FirstName = "Tyler", LastName = "Myles", StudentNumber = 2134567},
-			};
+
+				var myCommand = new SqlCommand(query, myConn);
+
+
+				//For offline connection we will use MySqlDataAdapter class.  
+				var myAdapter = new SqlDataAdapter
+				{
+					SelectCommand = myCommand
+				};
+
+				var dataTable = new DataTable();
+
+				myAdapter.Fill(dataTable);
+
+				if (dataTable.Rows.Count > 0)
+				{
+					foreach (DataRow row in dataTable.Rows)
+					{
+						members.Add(Support.CreateItemFromRow<Member>(row));
+					}
+				}
+			}
 		}
 
 		[Route("api/Members")]
@@ -33,6 +57,62 @@ namespace WebAPI.Controllers
 			response = JsonConvert.SerializeObject(members);
 			
 			
+
+			return response;
+		}
+
+		[HttpPost]
+		[Route("api/Members/add")]
+		public string AddMember([FromBody] Member member)
+		{
+			string response = "";
+
+			members.Add(member);
+
+			using (var myConn = new SqlConnection(Support.connectionString))
+			{
+				string query = $"INSERT INTO Members (FirstName, LastName, StudentNumber, CollegeEmail, ContactEmail, PhoneNumber) values ('{member.FirstName}', '{member.LastName}', {member.StudentNumber}, '{member.CollegeEmail}', '{member.ContactEmail}', '{member.PhoneNumber}')";
+
+				var myCommand = new SqlCommand(query, myConn);
+
+				//Data reader example. Connection must be opened. 
+				myConn.Open();
+
+				var numRowsAffected = myCommand.ExecuteNonQuery();
+
+				if (numRowsAffected == 0)
+				{
+					//TODO: error!
+				}
+
+			}
+
+			return response;
+		}
+
+		[HttpPost]
+		[Route("api/Members/remove")]
+		public string RemoveMember([FromBody] Member member)
+		{
+			string response = "";
+
+			using (var myConn = new SqlConnection(Support.connectionString))
+			{
+				string query = $"DELETE from Members WHERE MemberID = {member.MemberID};";
+
+				var myCommand = new SqlCommand(query, myConn);
+
+				//Data reader example. Connection must be opened. 
+				myConn.Open();
+
+				var numRowsAffected = myCommand.ExecuteNonQuery();
+
+				if (numRowsAffected == 0)
+				{
+					//TODO: error!
+				}
+
+			}
 
 			return response;
 		}

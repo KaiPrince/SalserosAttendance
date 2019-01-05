@@ -17,7 +17,7 @@ namespace WebAPI.Models
         [Required]
         public string LastName { get; set; }
 
-        [MaxLength(7)]
+        //[MaxLength(7)]
         public int StudentNumber { get; set; }
 
         //TODO: Make this required?
@@ -30,7 +30,6 @@ namespace WebAPI.Models
         [EmailAddress]
         public string ContactEmail { get; set; }
 
-
-        public ICollection<AttendanceRecord> AttendanceRecords { get; set; }
+		
     }
 }

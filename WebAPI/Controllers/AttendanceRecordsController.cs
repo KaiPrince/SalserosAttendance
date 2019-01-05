@@ -11,31 +11,73 @@ using System.IO;
 using System.Data;
 using System.Configuration;
 using WebAPI.Models;
+using System.Data.SqlClient;
 
 namespace WebAPI.Controllers
 {
 	[EnableCors(origins: "*", headers: "*", methods: "*")]
 	public class AttendanceRecordsController : ApiController
     {
-		List<AttendanceRecord> attendanceRecords;
-		List<Member> members;
+		List<AttendanceRecord> attendanceRecords = new List<AttendanceRecord>();
+		List<Member> members = new List<Member>();
 
-		string connectionString = ConfigurationManager.ConnectionStrings["LocalDB"].ConnectionString;
 
 		public AttendanceRecordsController()
 		{
 
-			members = new List<Member>
+			const string query = @"SELECT * FROM Members;";
+
+			using (var myConn = new SqlConnection(Support.connectionString))
 			{
-				new Member { MemberID = 1, FirstName = "Kai", LastName = "Prince", StudentNumber = 7952807 },
-				new Member {MemberID = 2, FirstName = "Tyler", LastName = "Myles", StudentNumber = 2134567},
-			};
+
+				var myCommand = new SqlCommand(query, myConn);
 
 
-			attendanceRecords = new List<AttendanceRecord>
+				//For offline connection we will use MySqlDataAdapter class.  
+				var myAdapter = new SqlDataAdapter
+				{
+					SelectCommand = myCommand
+				};
+
+				var dataTable = new DataTable();
+
+				myAdapter.Fill(dataTable);
+
+				if (dataTable.Rows.Count > 0)
+				{
+					foreach (DataRow row in dataTable.Rows)
+					{
+						members.Add(Support.CreateItemFromRow<Member>(row));
+					}
+				}
+			}
+
+			const string attendanceQuery = @"SELECT * FROM AttendanceRecords;";
+
+			using (var myConn = new SqlConnection(Support.connectionString))
 			{
-				new AttendanceRecord { MemberID = 2, EventID = 1 },
-			};
+
+				var myCommand = new SqlCommand(attendanceQuery, myConn);
+
+
+				//For offline connection we will use MySqlDataAdapter class.  
+				var myAdapter = new SqlDataAdapter
+				{
+					SelectCommand = myCommand
+				};
+
+				var dataTable = new DataTable();
+
+				myAdapter.Fill(dataTable);
+
+				if (dataTable.Rows.Count > 0)
+				{
+					foreach (DataRow row in dataTable.Rows)
+					{
+						attendanceRecords.Add(Support.CreateItemFromRow<AttendanceRecord>(row));
+					}
+				}
+			}
 		}
 
 
@@ -85,6 +127,56 @@ namespace WebAPI.Controllers
 			string response = "";
 
 			attendanceRecords.Add(new AttendanceRecord { EventID = attendanceRecord.EventID, MemberID = attendanceRecord.MemberID });
+
+			using (var myConn = new SqlConnection(Support.connectionString))
+			{
+				string query = $"INSERT INTO AttendanceRecords (EventID, MemberID) values ({attendanceRecord.EventID}, {attendanceRecord.MemberID})";
+
+				var myCommand = new SqlCommand(query, myConn);
+
+				//Data reader example. Connection must be opened. 
+				myConn.Open();
+
+				var numRowsAffected = myCommand.ExecuteNonQuery();
+
+				if (numRowsAffected == 0)
+				{
+					//TODO: error!
+				}
+
+			}
+
+			return response;
+		}
+
+		/// <summary>
+		/// This API call is used to remove a member from the attendance list of an event.
+		/// </summary>
+		/// <param name="attendanceRecord">The attendance record to remove</param>
+		/// <returns></returns>
+		[HttpPost]
+		[Route("api/AttendanceRecords/remove")]
+		public string RemoveAttendanceRecord([FromBody] AttendanceRecord attendanceRecord)
+		{
+			string response = "";
+
+			using (var myConn = new SqlConnection(Support.connectionString))
+			{
+				string query = $"DELETE from AttendanceRecords WHERE EventID = {attendanceRecord.EventID} AND MemberID = {attendanceRecord.MemberID}";
+
+				var myCommand = new SqlCommand(query, myConn);
+
+				//Data reader example. Connection must be opened. 
+				myConn.Open();
+
+				var numRowsAffected = myCommand.ExecuteNonQuery();
+
+				if (numRowsAffected == 0)
+				{
+					//TODO: error!
+				}
+
+			}
 
 			return response;
 		}
