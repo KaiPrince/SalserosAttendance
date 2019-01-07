@@ -24,16 +24,6 @@ namespace SalserosAttendance.Data
         {
             modelBuilder.Entity<AttendanceRecord>()
                 .HasKey(x => new { x.EventID, x.MemberID });
-
-            modelBuilder.Entity<AttendanceRecord>()
-                .HasOne(x => x.Event)
-                .WithMany(x => x.AttendanceRecords)
-                .HasForeignKey(x => x.EventID);
-
-            modelBuilder.Entity<AttendanceRecord>()
-                .HasOne(x => x.Member)
-                .WithMany(x => x.AttendanceRecords)
-                .HasForeignKey(x => x.MemberID);
         }
     }
 }

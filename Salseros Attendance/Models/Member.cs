@@ -17,10 +17,11 @@ namespace SalserosAttendance.Models
         [Required]
         public string LastName { get; set; }
 
+		[Required]
         [MaxLength(7)]
         public int StudentNumber { get; set; }
-
-        //TODO: Make this required?
+		
+		[Required]
         [EmailAddress]
         public string CollegeEmail { get; set; }
 
@@ -30,7 +31,5 @@ namespace SalserosAttendance.Models
         [EmailAddress]
         public string ContactEmail { get; set; }
 
-
-        public ICollection<AttendanceRecord> AttendanceRecords { get; set; }
     }
 }

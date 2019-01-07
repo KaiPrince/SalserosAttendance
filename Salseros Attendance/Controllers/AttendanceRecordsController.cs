@@ -27,12 +27,9 @@ namespace Salseros_Attendance.Controllers
         /// <returns>IEnumerable</returns>
         //[HttpGet("[action]")]
         [HttpGet]
-        public IEnumerable<Member> GetToday()
+        public IEnumerable<int> GetToday()
         {
-            //TODO: change this to return a list of ints, members, or a single attendance record
             //TODO change name or return type.
-            //TODO: change return type to minimize amount of data sent.
-            //IEnumerable<Member> todayRecord = _context.Events.Where(x => x.Date == DateTime.Now.Date).SelectMany(x => x.AttendanceRecords.Select(y => y.Member));
 
             //Get today's eventID
             Event todayEvent;
@@ -50,7 +47,7 @@ namespace Salseros_Attendance.Controllers
             //  TODO: change this to use ID integer only, for optimized processing
 
             //TODO: for testing only, we will hardcode the first event, until we finish crud functionality
-            todayEvent = _context.Events.FirstOrDefault();
+            todayEvent = _context.Events.FirstOrDefault(); //REMOVE
 
             //... or Create Event
             if (todayEvent == null)
@@ -64,20 +61,46 @@ namespace Salseros_Attendance.Controllers
                 _context.SaveChanges();
             }
 
-            //Get Attending Members
-            IEnumerable<Member> attendingMembers = _context.AttendanceRecords.Where(x => x.Event == todayEvent).Select(x => x.Member);
-            
-            return attendingMembers;
+			//Get Attending Members
+			var attendanceResults = _context.AttendanceRecords.Where(x => x.EventID == todayEvent.EventID).Select(x => x.MemberID);
+			
+			IEnumerable<Member> attendingMembers = _context.Members.Where(x => attendanceResults.Any(y => y == x.MemberID));
+
+			IEnumerable<int> attendingMemberIDs = attendingMembers.Select(x => x.MemberID);
+
+            return attendingMemberIDs;
         }
 
         // GET: api/AttendanceRecords
         [HttpGet("all")]
-        public IEnumerable<AttendanceRecord> GetAttendanceRecords()
+        public IEnumerable<AttendanceRecord> GetAllAttendanceRecords()
         {
             return _context.AttendanceRecords.ToList();
         }
 
-        /*
+		[HttpPut("[action]/{id}")]
+		public async Task<IActionResult> AttendTodayEvent([FromRoute] int id)
+		{//TODO: change this to take an EventID instead
+			Event todayEvent = _context.Events.FirstOrDefault();//_context.Events.Where(x => x.Date == DateTime.Now.Date).LastOrDefault();
+			if (todayEvent == null)
+			{
+				//TODO create event
+			}
+
+			var attendanceRecord = new AttendanceRecord
+			{
+				EventID = todayEvent.EventID,
+				MemberID = id,
+			};
+
+			//TODO: don't allow duplicate adding of members
+			await _context.AttendanceRecords.AddAsync(attendanceRecord);
+			await _context.SaveChangesAsync();
+
+			return Ok();
+		}
+
+		/*
         // GET: api/AttendanceRecords/5
         [HttpGet("{id}")]
         public async Task<IActionResult> GetAttendanceRecord([FromRoute] int id)
@@ -174,5 +197,5 @@ namespace Salseros_Attendance.Controllers
             return _context.AttendanceRecords.Any(e => e.AttendanceRecordID == id);
         }
         */
-    }
+	}
 }

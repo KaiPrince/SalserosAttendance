@@ -72,9 +72,7 @@ namespace SalserosAttendance.Data
                                 new AttendanceRecord
                                 {
                                     EventID = context.Events.First().EventID,
-                                    Event = context.Events.First(),
                                     MemberID = member.MemberID,
-                                    Member = member,
                                 }
                          );
                     }

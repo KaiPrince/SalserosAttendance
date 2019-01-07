@@ -23,8 +23,5 @@ namespace SalserosAttendance.Models
         [Required]
         [DataType(DataType.Date)]
         public DateTime Date { get; set; }
-
-
-        public ICollection<AttendanceRecord> AttendanceRecords { get; set; }
     }
 }

@@ -89,8 +89,7 @@ export default class SignInPage extends Component {
     }
 
     addMember(member) {
-        //this.setState({ membersList: [...this.state.membersList, {...member, firstname: member.FirstName, lastName: member.LastName, studentID: member.StudentNumber }] });
-
+        //TODO: handle errors and recieve memberID to add to attendance
         let messageBody = JSON.stringify(member);
 
         fetch(`api/Members/add`,
@@ -101,8 +100,11 @@ export default class SignInPage extends Component {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
                 },
-            }).then(
+            })
+            .then(res => res.json())
+            .then(
                 (result) => {
+                    console.log(result);
                     this.setState({ willAddNewMemberToAttendance: true }, () => {
                         this.loadAllMembers();
                     });
@@ -157,7 +159,7 @@ export default class SignInPage extends Component {
     addMemberToAttendance(eventID, memberID) {
         let messageBody = JSON.stringify({ EventID: eventID, MemberID: memberID });
 
-        fetch(`api/AttendanceRecords/attend`,
+        fetch(`api/AttendanceRecords/attend` + memberID,
             {
                 method: "POST",
                 body: messageBody,
@@ -198,6 +200,10 @@ export default class SignInPage extends Component {
         membersList.forEach(member => {
             dropdownOptions.push({ id: member.MemberID, value: member.studentNumber.toString(), label: member.firstName + " " + member.lastName })
         });
+        let attendingMembers = [];
+        this.state.attendanceList.forEach(memberID => {
+            attendingMembers.push(this.state.membersList.filter(member => member.memberID === memberID));
+        })
 
         return (
             <div className="SignInPage">
@@ -259,7 +265,7 @@ export default class SignInPage extends Component {
                                         {(this.state.attendanceList.length === 0) && 
                                             <tr><td colSpan="5"><p className="mx-auto text-muted">No one's here yet...</p></td></tr>
                                         }
-                                        {this.state.attendanceList.map((member) => <tr key={member.memberID}>
+                                        {attendingMembers.map((member) => <tr key={member.memberID}>
                                             <td>{member.firstName} {member.lastName}</td>
                                             <td>{member.studentNumber}</td>
                                             <td>{member.collegeEmail}</td>
