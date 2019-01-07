@@ -114,7 +114,7 @@ namespace Salseros_Attendance.Controllers
                 return NotFound();
             }
 
-            _context.Members.Remove(member);
+            _context.Members.Remove(member); //TODO: mark as inactive instead
             await _context.SaveChangesAsync();
 
             return Ok(member);

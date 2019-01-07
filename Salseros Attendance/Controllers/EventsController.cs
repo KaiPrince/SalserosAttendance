@@ -25,21 +25,7 @@ namespace Salseros_Attendance.Controllers
 		[HttpGet]
 		public int GetToday()
 		{
-			//Get today's eventID
-			Event todayEvent;
-			var allTodayEvents = _context.Events.Where(x => x.Date == DateTime.Now.Date);
-			try
-			{
-				todayEvent = allTodayEvents.SingleOrDefault();
-			}
-			catch (InvalidOperationException)
-			{
-				//If there is more than one event on the same day, we will simply use the last (newest) one
-				todayEvent = allTodayEvents.LastOrDefault();
-				//TODO: change this to just use LastOrDefault on the first try instead of two statements.
-			}
-
-			return todayEvent.EventID;
+			return Event.GetToday(_context).EventID;
 		}
 
         // GET: api/Events/all

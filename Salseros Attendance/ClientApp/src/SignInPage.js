@@ -159,7 +159,7 @@ export default class SignInPage extends Component {
     addMemberToAttendance(eventID, memberID) {
         let messageBody = JSON.stringify({ EventID: eventID, MemberID: memberID });
 
-        fetch(`api/AttendanceRecords/attend` + memberID,
+        fetch(`api/AttendanceRecords/AttendEvent`,
             {
                 method: "POST",
                 body: messageBody,
