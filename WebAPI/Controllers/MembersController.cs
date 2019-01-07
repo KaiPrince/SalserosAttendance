@@ -67,6 +67,10 @@ namespace WebAPI.Controllers
 		{
 			string response = "";
 
+			//Validate Member
+			//TODO: add validation and handle excceptions in client app
+			//if (member.StudentNumber.ToString().Length != )
+
 			members.Add(member);
 
 			using (var myConn = new SqlConnection(Support.connectionString))

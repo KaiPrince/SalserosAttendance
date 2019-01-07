@@ -11,7 +11,7 @@ namespace WebAPI
 	public class Support
 	{
 
-		public static string connectionString = ConfigurationManager.ConnectionStrings["LocalDB"].ConnectionString;
+		public static string connectionString = ConfigurationManager.ConnectionStrings["AzureDB"].ConnectionString;
 
 
 		//Code from https://stackoverflow.com/questions/19673502/how-to-convert-datarow-to-an-object
