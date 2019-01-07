@@ -1,5 +1,3 @@
-import 'bootstrap/dist/css/bootstrap.css';
-import 'bootstrap/dist/css/bootstrap-theme.css';
 import './index.css';
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -9,6 +7,7 @@ import { createBrowserHistory } from 'history';
 import configureStore from './store/configureStore';
 import App from './App';
 import registerServiceWorker from './registerServiceWorker';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 // Create browser history to use in the Redux store
 const baseUrl = document.getElementsByTagName('base')[0].getAttribute('href');
@@ -20,12 +19,14 @@ const store = configureStore(history, initialState);
 
 const rootElement = document.getElementById('root');
 
-ReactDOM.render(
+/* ReactDOM.render(
   <Provider store={store}>
     <ConnectedRouter history={history}>
       <App />
     </ConnectedRouter>
   </Provider>,
-  rootElement);
+  rootElement); */
+
+  ReactDOM.render(<App />, document.getElementById('root'));
 
 registerServiceWorker();

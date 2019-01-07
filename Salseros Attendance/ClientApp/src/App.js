@@ -6,8 +6,9 @@ import Counter from './components/Counter';
 import FetchData from './components/FetchData';
 import Attendance from './components/Attendance';
 import Tutorial from './components/Tutorial';
+import SignInPage from './SignInPage';
 
-export default () => (
+/* export default () => (
     <Layout>
         <Route exact path='/' component={Home} />
         <Route path='/counter' component={Counter} />
@@ -15,4 +16,16 @@ export default () => (
         <Route path='/attendance' component={Attendance} />
         <Route path='/test' component={Tutorial} />
     </Layout>
-);
+); */
+
+class App extends React.Component {
+    render() {
+      return (
+        <div className="App">
+          <SignInPage />
+        </div>
+      );
+    }
+  }
+  
+  export default App;

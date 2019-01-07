@@ -2,11 +2,7 @@
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { actionCreators } from '../store/Members';
-//TODO: upgrade from react-bootstrap -> react-strap
-import { FormControl, Button } from 'react-bootstrap';
-import { Dropdown } from 'semantic-ui-react';
-import Select from 'react-select';
-import Creatable from 'react-select/lib/Creatable';
+import { Container, Row, Col, Button, InputGroup, InputGroupAddon, InputGroupText, Input, Table, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import CreatableSelect from 'react-select/lib/Creatable';
 
 
@@ -39,46 +35,67 @@ class SearchBar extends Component {
         this.props.addMemberToAttendance(member);
     }
 
-    //CreatableSelect
-    handleCreatableSelectChange = (newValue: any, actionMeta: any) => {
-        console.group('Value Changed');
+    handleChange = (newValue) => {
+        //Add member to attendance list.
         console.log(newValue);
-        console.log(`action: ${actionMeta.action}`);
-        console.groupEnd();
-      };
-      handleCreatableSelectInputChange = (inputValue: any, actionMeta: any) => {
-        console.group('Input Changed');
-        console.log(inputValue);
-        console.log(`action: ${actionMeta.action}`);
-        console.groupEnd();
-      }
 
-	render() {
-		var membersList = this.searchMember(this.state.searchString);
-		var selectionOptions = this.props.members;
+        this.addMemberToAttendance(this.state.eventID, newValue.id);
+
+        this.setState({ SignInTextBoxValue: null });
+
+    };
+
+    addMemberToAttendance(eventID, memberID) {
+        let messageBody = JSON.stringify({ EventID: eventID, MemberID: memberID });
+
+        fetch(`http://localhost:3396/api/AttendanceRecords/attend`,
+            {
+                method: "POST",
+                body: messageBody,
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+            }).then(
+                (result) => {
+                    this.loadAttendanceList();
+                },
+                (error) => {
+                    console.log(error);
+                }
+            );
+    }
+
+    handleCreate = (inputValue) => {
+        let parsedInput = inputValue.split(" ");
+        let parsedfirstname = parsedInput[0];
+        let parsedlastname = parsedInput[1];
+
+
+        //Create new member
+        this.setState({ memberToAdd: { firstname: parsedfirstname, lastname: parsedlastname, studentID: null } });
+        this.setState({ showAddMemberDialog: true });
+    };
+
+    render() {
+        let membersList = this.state.membersList;
+        let dropdownOptions = [];
+        membersList.forEach(member => {
+            dropdownOptions.push({ id: member.MemberID, value: member.studentID.toString(), label: member.firstname + " " + member.lastname })
+        });
 
         return (
             <div>
-                https://react.semantic-ui.com/modules/dropdown/#types-search-selection
-                <Dropdown placeholder='Enter name' fluid search selection options={membersList} />
-				<CreatableSelect options={membersList} />
-                https://material-ui.com/demos/autocomplete/
-                https://react-select.com/creatable
-
-
-
-                <FormControl type="text" placeholder="Enter your name" className={this.props.className} value={this.state.searchString} onChange={this.handleChange} />
-                <div>
-                    <ul>
-                        {membersList.map(member =>
-                            <li key={member.memberID} >
-                                <Button onClick={() => this.addMemberToAttendance(member)} >
-                                    {member.firstName} {member.lastName}
-                                </Button>
-                            </li>
-                        )}
-                    </ul>
-                </div>
+                <CreatableSelect
+                    id="SignInTextBox"
+                    ref={this.SignInTextBox}
+                    placeholder="Enter your name or student number..."
+                    isClearable
+                    onCreateOption={this.handleCreate}
+                    onChange={this.handleChange}
+                    options={dropdownOptions}
+                    value={this.state.SignInTextBoxValue}
+                />
             </div>
         );
     }
