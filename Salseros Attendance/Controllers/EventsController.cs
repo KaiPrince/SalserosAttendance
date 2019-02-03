@@ -23,9 +23,9 @@ namespace Salseros_Attendance.Controllers
 
 		// GET: api/Events
 		[HttpGet]
-		public int GetToday()
+		public Event GetToday()
 		{
-			return Event.GetToday(_context).EventID;
+			return Event.GetToday(_context);
 		}
 
         // GET: api/Events/all

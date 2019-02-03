@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import AddMemberDialog from './AddMemberDialog';
+import ChangeEventDateDialog from './ChangeEventDateDialog';
 import CreatableSelect from 'react-select/lib/Creatable';
-import { Container, Row, Col, Button, InputGroup, InputGroupAddon, InputGroupText, Input, Table, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
+import { Container, Row, Col, Button, FormGroup, Label, InputGroup, InputGroupAddon, InputGroupText, Input, Table, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 
 
 export default class SignInPage extends Component {
@@ -12,22 +13,32 @@ export default class SignInPage extends Component {
             membersList: [],
             attendanceList: [],
             showAddMemberDialog: false,
+            showChangeEventDateModal: false,
             memberToAdd: null,
             SignInTextBoxValue: null,
-            eventID: 1,
+            eventID: null,
+            event: null,
+            allEvents: null,
             willAddNewMemberToAttendance: false,
+            willCreateNewEvent: false,
         };
 
         this.SignInTextBox = React.createRef();
         this.addMemberDialogRef = React.createRef();
+        this.changeEventDateDialogRef = React.createRef();
 
         this.handleChange = this.handleChange.bind(this);
+        this.handleInputChange = this.handleInputChange.bind(this); //TODO: remove?
         this.handleCreate = this.handleCreate.bind(this);
         this.addMember = this.addMember.bind(this);
         this.removeMemberFromAttendance = this.removeMemberFromAttendance.bind(this);
         this.loadAllMembers = this.loadAllMembers.bind(this);
         this.loadAttendanceList = this.loadAttendanceList.bind(this);
+        this.loadAllEvents = this.loadAllEvents.bind(this);
+        this.loadEventByID = this.loadEventByID.bind(this);
+        this.createNewEvent = this.createNewEvent.bind(this);
         this.toggle = this.toggle.bind(this);
+        this.ChangeEventDateModalToggle = this.ChangeEventDateModalToggle.bind(this);
         this.addMemberToAttendance = this.addMemberToAttendance.bind(this);
     }
 
@@ -40,11 +51,14 @@ export default class SignInPage extends Component {
         //Load all members
         this.loadAllMembers();
 
+        //Load today's event
+        this.loadEventByID(this.state.eventID);
 
         //Load current attendance list
-        this.loadAttendanceList();
+        this.loadAttendanceList(this.state.eventID);
 
     }
+
 
     loadAllMembers() {
         fetch(`api/members`)
@@ -56,7 +70,7 @@ export default class SignInPage extends Component {
                     if (this.state.willAddNewMemberToAttendance) {
                         let allIDs = [];
                         this.state.membersList.forEach(member => {
-                            allIDs.push(member.MemberID);
+                            allIDs.push(member.memberID);
                         });
                         let newMemberID = Math.max(...allIDs);
 
@@ -69,12 +83,112 @@ export default class SignInPage extends Component {
                 }
             );
 
-            
+
     }
 
-    loadAttendanceList() {
-        var eventID = 1;
-        fetch(`api/AttendanceRecords/`)
+    loadEventByID(eventID) {
+        console.log("loading event for " + eventID);
+        if (eventID === null || eventID === undefined || eventID === 0) {
+
+            fetch(`api/Events/`)
+                .then(res => res.json())
+                .then(
+                    (result) => {
+                        this.setState({ eventID: result.eventID, event: result },
+                            () => {
+                                if (this.state.event === null) {
+                                    //this.setState({willCreateNewEvent: true});
+                                    var today = new Date();
+                                    var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+                                    this.createNewEvent("Salsa Class", date); //TODO: prompt for title
+                                }
+                            })
+                        
+                    },
+                    (error) => {
+                        console.log(error);
+                    }
+                );
+        } else {
+            
+            fetch(`api/Events/` + eventID)
+            .then(res => res.json())
+            .then(
+                (result) => {
+                    console.log(result);
+                    this.setState({ eventID: result.eventID, event: result },
+                        () => {
+                            if (this.state.event === null) {
+                                //this.setState({willCreateNewEvent: true});
+                                var today = new Date();
+                                var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+                                this.createNewEvent("Salsa Class", date); //TODO: prompt for title
+                            }
+                            this.loadAttendanceList(this.state.eventID); //TODO change functions to await async instead of calling this twice.
+                        })
+                    
+                },
+                (error) => {
+                    console.log(error);
+                }
+            );
+        }
+
+        //TODO: this is handling the behaviour of ChangeEventDialog class. Need to decouple.
+        this.setState({ showChangeEventDateModal: false });
+        this.SignInTextBox.current.focus();
+    }
+
+    loadAllEvents() {
+        fetch(`api/Events/all`)
+                .then(res => res.json())
+                .then(
+                    (result) => {
+                        console.log(result);
+                        this.setState({ allEvents: result },
+                            () => {
+                                if (this.state.allEvents === null) {
+                                    //TODO: handle no events returned error.
+                                }
+                            })
+                    },
+                    (error) => {
+                        console.log(error);
+                    }
+                );
+    }
+
+    createNewEvent(title, date) {
+        let event = {
+            title: "Salsa Class",
+            date: date
+        };
+
+        let messageBody = event;
+
+        fetch(`api/Events/`,
+            {
+                method: "POST",
+                body: messageBody,
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+            })
+            .then(res => res.json())
+            .then(
+                (result) => {
+                    //this.setState({ eventID: result.eventID, event: result })
+                },
+                (error) => {
+                    console.log(error);
+                }
+            );
+    }
+
+    loadAttendanceList(eventID) {
+        if (eventID === null || eventID === undefined || eventID === 0) {
+            fetch(`api/AttendanceRecords/`)
             .then(res => res.json())
             .then(
                 (result) => {
@@ -86,6 +200,21 @@ export default class SignInPage extends Component {
                     console.log(error);
                 }
             );
+        } else {
+            fetch(`api/AttendanceRecords/` + eventID)
+            .then(res => res.json())
+            .then(
+                (result) => {
+                    this.setState({ attendanceList: result });
+
+                    this.setState({ willAddNewMemberToAttendance: false });
+                },
+                (error) => {
+                    console.log(error);
+                }
+            );
+        }
+        
     }
 
     addMember(member) {
@@ -104,7 +233,6 @@ export default class SignInPage extends Component {
             .then(res => res.json())
             .then(
                 (result) => {
-                    console.log(result);
                     this.setState({ willAddNewMemberToAttendance: true }, () => {
                         this.loadAllMembers();
                     });
@@ -119,42 +247,6 @@ export default class SignInPage extends Component {
         this.setState({ showAddMemberDialog: false });
         this.SignInTextBox.current.focus();
     }
-
-    removeMemberFromAttendance(MemberID) {
-        //Remove member from attendance list.
-        console.log(MemberID);
-
-        let messageBody = JSON.stringify({ EventID: this.state.eventID, MemberID: MemberID });
-
-        fetch(`api/AttendanceRecords/remove`,
-            {
-                method: "POST",
-                body: messageBody,
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-            }).then(
-                (result) => {
-                    this.loadAttendanceList();
-                },
-                (error) => {
-                    console.log(error);
-                }
-            );
-
-
-    }
-
-    handleChange = (newValue) => {
-        //Add member to attendance list.
-        console.log(newValue);
-
-        this.addMemberToAttendance(this.state.eventID, newValue.id);
-
-        this.setState({ SignInTextBoxValue: null });
-
-    };
 
     addMemberToAttendance(eventID, memberID) {
         let messageBody = JSON.stringify({ EventID: eventID, MemberID: memberID });
@@ -177,15 +269,81 @@ export default class SignInPage extends Component {
             );
     }
 
+    removeMemberFromAttendance(MemberID) {
+        //Remove member from attendance list.
+
+        let messageBody = JSON.stringify({ EventID: this.state.eventID, MemberID: MemberID });
+
+        fetch(`api/AttendanceRecords/remove`,
+            {
+                method: "POST",
+                body: messageBody,
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+            }).then(
+                (result) => {
+                    this.loadAttendanceList();
+                },
+                (error) => {
+                    console.log(error);
+                }
+            );
+
+
+
+    }
+
+    handleInputChange = (inputValue, actionMeta) => {
+
+    }
+
+    handleChange = (newValue) => {
+        if (newValue !== null && newValue !== undefined) {
+            //Add member to attendance list.
+
+            this.addMemberToAttendance(this.state.eventID, newValue.id);
+
+            this.setState({ SignInTextBoxValue: null });
+        }
+
+    };
+
+
     handleCreate = (inputValue) => {
-        let parsedInput = inputValue.split(" ");
-        let parsedfirstName = parsedInput[0];
-        let parsedlastName = parsedInput[1];
+        if (inputValue !== null && inputValue !== undefined) {
+            let parsedInput = inputValue.split(" ");
+            let parsedfirstName = null;
+            let parsedlastName = null;
+            let parsedstudentID = null;
+
+            //Match student number: ^[0-9]{7}$
+            var studentIDPattern = new RegExp('^[0-9]{7}$');
+            //Match First and last name \w+
+            var namePattern = new RegExp('\\w+');
+
+            parsedInput.forEach(token => {
+                if (studentIDPattern.test(token)) {
+                    parsedstudentID = token;
+                } else if (parsedfirstName == null && namePattern.test(token)) {
+                    parsedfirstName = token;
+                } else if (namePattern.test(token)) {
+                    if (parsedlastName === null) parsedlastName = "";
+                    if (parsedlastName !== "") parsedlastName += " ";
+                    parsedlastName += token;
+                }
+            });
+
+            //Create new member
+            this.setState({ memberToAdd: { firstName: parsedfirstName, lastName: parsedlastName, studentNumber: parsedstudentID } });
+            this.setState({ showAddMemberDialog: true });
+        }
+       
 
 
-        //Create new member
-        this.setState({ memberToAdd: { firstName: parsedfirstName, lastName: parsedlastName, studentNumber: null } });
-        this.setState({ showAddMemberDialog: true });
+
+
     };
 
     toggle() {
@@ -194,22 +352,42 @@ export default class SignInPage extends Component {
         });
     }
 
+    ChangeEventDateModalToggle() {
+        this.setState({
+            showChangeEventDateModal: !this.state.showChangeEventDateModal
+        });
+    }
+
     render() {
         let membersList = this.state.membersList;
         let dropdownOptions = [];
         membersList.forEach(member => {
-            dropdownOptions.push({ id: member.MemberID, value: member.studentNumber.toString(), label: member.firstName + " " + member.lastName })
+            dropdownOptions.push({ id: member.memberID, value: member.studentNumber.toString(), label: member.firstName + " " + member.lastName })
         });
-        let attendingMembers = [];
-        this.state.attendanceList.forEach(memberID => {
-            attendingMembers.push(this.state.membersList.filter(member => member.memberID === memberID));
-        })
+        //TODO: optimize.
+        let attendingMembers = this.state.membersList.filter(member => this.state.attendanceList.includes(member.memberID));
 
         return (
             <div className="SignInPage">
                 <Container fluid>
                     <Row>
-                        <Col sm="2"></Col>
+                        <Col sm="2">
+                            <Row>
+                                <Button color="secondary" onClick={() => {this.loadAllEvents(); this.ChangeEventDateModalToggle()}} >Change Date</Button>
+                                <div className="ChangeEventDateModal">
+                                    <Modal isOpen={this.state.showChangeEventDateModal} toggle={this.ChangeEventDateModalToggle} onOpened={() => { }}>
+                                        <ModalHeader toggle={this.ChangeEventDateModalToggle}>Change Event</ModalHeader>
+                                        <ModalBody>
+                                            <ChangeEventDateDialog ref={this.changeEventDateDialogRef} handleLoadEvent={this.loadEventByID} allEvents={this.state.allEvents}/>
+                                        </ModalBody>
+                                        <ModalFooter>
+                                            <Button color="primary" onClick={(event) => this.changeEventDateDialogRef.current.handleSubmit(event)}>Done</Button>
+                                            <Button color="secondary" onClick={this.ChangeEventDateModalToggle}>Cancel</Button>
+                                        </ModalFooter>
+                                    </Modal>
+                                </div>
+                            </Row>
+                        </Col>
                         <Col lg="8">
                             <Row>
 
@@ -229,9 +407,14 @@ export default class SignInPage extends Component {
                                         onChange={this.handleChange}
                                         options={dropdownOptions}
                                         value={this.state.SignInTextBoxValue}
+                                        formatCreateLabel={(inputValue) => {return "New Member? Click here."}}
+                                        onInputChange={this.handleInputChange} //TODO: Remove this and the create button?
                                     />
 
                                 </Col>
+                                {/* <Col sm="2">
+                                    <Button color="primary" onClick={() => {this.handleCreate(this.SignInTextBox.value)}}>Create</Button>
+                                </Col> */}
 
                             </Row>
                             <Row>
@@ -243,7 +426,7 @@ export default class SignInPage extends Component {
                                                 <AddMemberDialog {...this.state.memberToAdd} ref={this.addMemberDialogRef} handleAddMember={this.addMember} />
                                             </ModalBody>
                                             <ModalFooter>
-                                                <Button color="primary" onClick={(event) => this.addMemberDialogRef.current.handleSubmit(event)}>Do Something</Button>
+                                                <Button color="primary" onClick={(event) => this.addMemberDialogRef.current.handleSubmit(event)}>Done</Button>
                                                 <Button color="secondary" onClick={this.toggle}>Cancel</Button>
                                             </ModalFooter>
                                         </Modal>
@@ -262,7 +445,7 @@ export default class SignInPage extends Component {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {(this.state.attendanceList.length === 0) && 
+                                        {(this.state.attendanceList.length === 0) &&
                                             <tr><td colSpan="5"><p className="mx-auto text-muted">No one's here yet...</p></td></tr>
                                         }
                                         {attendingMembers.map((member) => <tr key={member.memberID}>
@@ -270,7 +453,7 @@ export default class SignInPage extends Component {
                                             <td>{member.studentNumber}</td>
                                             <td>{member.collegeEmail}</td>
                                             <td>{member.contactEmail}</td>
-                                            <td><Input type="button" value="Remove" onClick={() => this.removeMemberFromAttendance(member.MemberID)} /></td>
+                                            <td><Input type="button" value="Remove" onClick={() => this.removeMemberFromAttendance(member.memberID)} /></td>
                                         </tr>
                                         )}
                                     </tbody>

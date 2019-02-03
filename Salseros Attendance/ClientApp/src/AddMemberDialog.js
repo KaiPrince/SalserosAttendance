@@ -16,6 +16,7 @@ export default class AddMemberDialog extends Component {
             isStudentIDPopoverOpen: false,
         };
 
+        this.firstNameTextBox = React.createRef();
         this.lastNameTextBox = React.createRef();
         this.studentNumberTextBox = React.createRef();
         this.collegeEmailTextBox = React.createRef();
@@ -27,7 +28,9 @@ export default class AddMemberDialog extends Component {
     }
 
     focusInputElement() {
-        if (this.props.lastName === null || this.props.lastName === undefined) {
+        if (this.props.firstName === null || this.props.firstName === undefined) {
+            this.firstNameTextBox.current.focus();
+        } else if (this.props.lastName === null || this.props.lastName === undefined) {
             this.setState({isLastNamePopoverOpen: true});
             this.lastNameTextBox.current.focus();
         } else if (this.props.studentNumber === null) {
@@ -42,13 +45,7 @@ export default class AddMemberDialog extends Component {
     }
 
     componentDidMount() {
-        if (this.props.lastName === null || this.props.lastName === undefined) {
-            this.lastNameTextBox.current.focus();
-        } else if (this.props.studentNumber === null) {
-            this.studentNumberTextBox.current.focus();
-        } else {
-            this.collegeEmailTextBox.current.focus();
-        }
+        this.focusInputElement();
     }
 
     handleStudentIDChange(event) {
@@ -109,7 +106,6 @@ export default class AddMemberDialog extends Component {
             studentNumberFocus = true;
         }
 
-        console.log(this.state.firstName);
         return (
             <div className="AddMemberDialog">
 
@@ -119,7 +115,7 @@ export default class AddMemberDialog extends Component {
                             <FormGroup>
                                 <InputGroup size="sm">
                                     <InputGroupAddon addonType="prepend">First Name:</InputGroupAddon>
-                                    <Input name="firstName" placeholder="First Name" type="text" value={this.state.firstName} onChange={this.handleInputChange} required />
+                                    <Input name="firstName" placeholder="First Name" type="text" innerRef={this.firstNameTextBox} value={this.state.firstName} onChange={this.handleInputChange} required />
                                 </InputGroup>
                             </FormGroup>
                         </Col>
@@ -137,7 +133,7 @@ export default class AddMemberDialog extends Component {
                             <FormGroup>
                                 <InputGroup size="sm">
                                     <InputGroupAddon addonType="prepend">Student ID:</InputGroupAddon>
-                                    <Input name="studentNumber" autoFocus={studentNumberFocus} placeholder="Student ID" innerRef={this.studentNumberTextBox} type="text" value={this.state.studentNumber} onChange={this.handleStudentIDChange} required />
+                                    <Input name="studentNumber" autoFocus={studentNumberFocus} placeholder="Student ID" innerRef={this.studentNumberTextBox} type="text" value={this.state.studentNumber} onChange={this.handleStudentIDChange} onBlur={() => this.setState({isStudentIDPopoverOpen: false})} required />
                                 </InputGroup>
                                 <Popover /* trigger="focus" */ placement="bottom" isOpen={this.state.isStudentIDPopoverOpen} target={this.studentNumberTextBox} toggle={() => {this.setState({isStudentIDPopoverOpen: !this.state.isStudentIDPopoverOpen})}}>
                                     <PopoverHeader>
@@ -176,8 +172,10 @@ export default class AddMemberDialog extends Component {
                     </Row>
 
 
-                    <Input type="submit" value="Add Member" />
-                    <Input type="button" value="popover" onClick={() => {this.setState({isLastNamePopoverOpen: true})}} />
+                    {/* 
+                    <Input type="submit" value="Add Member" /> 
+                    <Input type="button" value="popover" onClick={() => {this.setState({isLastNamePopoverOpen: true})}} /> 
+                    */}
                 </Form>
             </div>
         );

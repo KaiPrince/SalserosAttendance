@@ -18,17 +18,17 @@ namespace SalserosAttendance.Models
         public string LastName { get; set; }
 
 		[Required]
-        [MaxLength(7)]
+		//[MaxLength(7)]
         public int StudentNumber { get; set; }
 		
 		[Required]
         [EmailAddress]
         public string CollegeEmail { get; set; }
 
-        [Phone]
+        //[Phone]
         public string PhoneNumber { get; set; }
 
-        [EmailAddress]
+        //[EmailAddress]
         public string ContactEmail { get; set; }
 
     }

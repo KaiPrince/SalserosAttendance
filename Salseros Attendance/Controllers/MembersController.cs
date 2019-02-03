@@ -84,8 +84,8 @@ namespace Salseros_Attendance.Controllers
             return NoContent();
         }
 
-        // POST: api/Members
-        [HttpPost]
+        // POST: api/Members/add
+        [HttpPost("add")]
         public async Task<IActionResult> AddMember([FromBody] Member member)
         {
             if (!ModelState.IsValid)
@@ -100,7 +100,7 @@ namespace Salseros_Attendance.Controllers
         }
 
         // DELETE: api/Members/5
-        [HttpDelete("{id}")]
+        [HttpDelete("remove/{id}")]
         public async Task<IActionResult> DeleteMember([FromRoute] int id)
         {
             if (!ModelState.IsValid)

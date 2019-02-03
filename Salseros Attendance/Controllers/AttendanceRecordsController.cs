@@ -88,9 +88,12 @@ namespace Salseros_Attendance.Controllers
 		[HttpPost("[action]")]
 		public async Task<IActionResult> AttendEvent([FromBody] AttendanceRecord attendanceRecord)
 		{
-
-			//TODO: don't allow duplicate adding of members
-			await _context.AttendanceRecords.AddAsync(attendanceRecord);
+			
+			if (!_context.AttendanceRecords.Any(x => x.EventID == attendanceRecord.EventID && x.MemberID == attendanceRecord.MemberID))
+			{
+				await _context.AttendanceRecords.AddAsync(attendanceRecord);
+			}
+			
 			await _context.SaveChangesAsync();
 
 			return Ok();
@@ -103,9 +106,8 @@ namespace Salseros_Attendance.Controllers
 			{
 				return BadRequest(ModelState);
 			}
-			
 
-			if (!_context.AttendanceRecords.Contains(attendanceRecord))
+			if (!_context.AttendanceRecords.Any(x => x.EventID == attendanceRecord.EventID && x.MemberID == attendanceRecord.MemberID))
 			{
 				return NotFound();
 			}

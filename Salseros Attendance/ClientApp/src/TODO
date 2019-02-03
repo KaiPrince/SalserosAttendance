@@ -1,0 +1,16 @@
+- Add colour and Logo
+- Handle student number in input box
+- Regenerate conestoga email regardless of sequence of inputs
+- Take out test buttons
+- Parse student number into correct field (not first name)
+- Auto capitalize names
+- Add enter button to search box (or GO)
+- Edit button for members (pencil icon)
+- Change remove button to trash can icon
+- Change Typeface.
+- Remove options column header
+- Change student Number to No. (one line)
+- Add margins and padding
+- Change colors of inputs in Add new member dialog to make optional inputs more ignorable.
+
+- Add prompt before creating a new event for new today.

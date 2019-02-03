@@ -7,6 +7,8 @@ import FetchData from './components/FetchData';
 import Attendance from './components/Attendance';
 import Tutorial from './components/Tutorial';
 import SignInPage from './SignInPage';
+import { Card, CardImg, CardText, CardBody,
+  CardTitle, CardSubtitle, Button } from 'reactstrap';
 
 /* export default () => (
     <Layout>
