@@ -119,10 +119,7 @@ export default class SignInPage extends Component {
                     this.setState({ eventID: result.eventID, event: result },
                         () => {
                             if (this.state.event === null) {
-                                //this.setState({willCreateNewEvent: true});
-                                var today = new Date();
-                                var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
-                                this.createNewEvent("Salsa Class", date); //TODO: prompt for title
+                                //TODO: Error message. Handle no event found.
                             }
                             this.loadAttendanceList(this.state.eventID); //TODO change functions to await async instead of calling this twice.
                         })
@@ -187,6 +184,8 @@ export default class SignInPage extends Component {
     }
 
     loadAttendanceList(eventID) {
+        
+        console.log("loading attendance for " + eventID);
         if (eventID === null || eventID === undefined || eventID === 0) {
             fetch(`api/AttendanceRecords/`)
             .then(res => res.json())
@@ -249,7 +248,8 @@ export default class SignInPage extends Component {
     }
 
     addMemberToAttendance(eventID, memberID) {
-        let messageBody = JSON.stringify({ EventID: eventID, MemberID: memberID });
+        let messageBody = JSON.stringify({ EventID: eventID, MemberID: memberID, Time: new Date() });
+        console.log(messageBody);
 
         fetch(`api/AttendanceRecords/AttendEvent`,
             {
@@ -261,7 +261,7 @@ export default class SignInPage extends Component {
                 },
             }).then(
                 (result) => {
-                    this.loadAttendanceList();
+                    this.loadAttendanceList(this.state.eventID);
                 },
                 (error) => {
                     console.log(error);
@@ -284,7 +284,7 @@ export default class SignInPage extends Component {
                 },
             }).then(
                 (result) => {
-                    this.loadAttendanceList();
+                    this.loadAttendanceList(this.state.eventID);
                 },
                 (error) => {
                     console.log(error);
@@ -313,7 +313,7 @@ export default class SignInPage extends Component {
 
     handleCreate = (inputValue) => {
         if (inputValue !== null && inputValue !== undefined) {
-            let parsedInput = inputValue.split(" ");
+            let parsedInput = inputValue.replace(/\s+/g, ' ').split(" ");
             let parsedfirstName = null;
             let parsedlastName = null;
             let parsedstudentID = null;
@@ -331,7 +331,7 @@ export default class SignInPage extends Component {
                 } else if (namePattern.test(token)) {
                     if (parsedlastName === null) parsedlastName = "";
                     if (parsedlastName !== "") parsedlastName += " ";
-                    parsedlastName += token;
+                    parsedlastName += token.charAt(0).toUpperCase() + token.slice(1); //TODO: move this logic into the AddMemberDialog. (this is a workaround for when there are multiple words in the input string)
                 }
             });
 
@@ -365,15 +365,17 @@ export default class SignInPage extends Component {
             dropdownOptions.push({ id: member.memberID, value: member.studentNumber.toString(), label: member.firstName + " " + member.lastName })
         });
         //TODO: optimize.
-        let attendingMembers = this.state.membersList.filter(member => this.state.attendanceList.includes(member.memberID));
+        let attendingMembers = []; //this.state.membersList.filter(member => this.state.attendanceList.includes(member.memberID));
+        this.state.attendanceList.forEach(memberID => attendingMembers.push(this.state.membersList.find(member => member.memberID == memberID)));
 
         return (
             <div className="SignInPage">
                 <Container fluid>
                     <Row>
                         <Col sm="2">
+                            <Button color="secondary" onClick={() => {this.loadAllEvents(); this.ChangeEventDateModalToggle()}} >Change Date</Button>
+                                
                             <Row>
-                                <Button color="secondary" onClick={() => {this.loadAllEvents(); this.ChangeEventDateModalToggle()}} >Change Date</Button>
                                 <div className="ChangeEventDateModal">
                                     <Modal isOpen={this.state.showChangeEventDateModal} toggle={this.ChangeEventDateModalToggle} onOpened={() => { }}>
                                         <ModalHeader toggle={this.ChangeEventDateModalToggle}>Change Event</ModalHeader>

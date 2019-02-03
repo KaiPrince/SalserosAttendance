@@ -45,11 +45,43 @@ export default class ChangeEventDateDialog extends Component {
 
         if (matchingEvents.length === 1) {
             eventID = matchingEvents[0].eventID;
-        } else {
+            this.props.handleLoadEvent(eventID);
+
+        } else if (matchingEvents.length === 0) {
+            //Create new event
+            let event = {
+                title: "Salsa Class",
+                date: date
+            };
+    
+            let messageBody = event;
+    
+            fetch(`api/Events/`,
+                {
+                    method: "POST",
+                    body: JSON.stringify(messageBody),
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                })
+                .then(res => res.json())
+                .then(
+                    (result) => {
+                        console.log(result);
+                        //this.setState({ eventID: result.eventID, event: result })
+                        eventID = result.eventID; //TODO: this is coupled to the outer code.
+                        this.props.handleLoadEvent(eventID);
+                    },
+                    (error) => {
+                        console.log(error);
+                    }
+                );
+        }
+        else {
             //prompt for choice.
         }
 
-        this.props.handleLoadEvent(eventID);
     }
 
     render() {

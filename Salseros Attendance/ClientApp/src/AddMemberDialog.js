@@ -6,9 +6,9 @@ export default class AddMemberDialog extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            firstName: this.props.firstName === undefined ? "" : this.props.firstName,
-            lastName: this.props.lastName === undefined ? "" : this.props.lastName,
-            studentNumber: this.props.studentNumber === null ? "" : this.props.studentNumber,
+            firstName: this.props.firstName === undefined || this.props.firstName === null ? "" : this.props.firstName.charAt(0).toUpperCase() + this.props.firstName.slice(1),
+            lastName: this.props.lastName === undefined || this.props.lastName === null ? "" : this.props.lastName.charAt(0).toUpperCase() + this.props.lastName.slice(1),
+            studentNumber: this.props.studentNumber === undefined || this.props.studentNumber === null ? "" : this.props.studentNumber,
             collegeEmail: "",
             contactEmail: "",
             phoneNumber: "",
@@ -46,6 +46,13 @@ export default class AddMemberDialog extends Component {
 
     componentDidMount() {
         this.focusInputElement();
+
+        if (this.state.studentNumber !== null && this.state.studentNumber !== undefined && this.state.studentNumber !== ""
+        && this.state.firstName !== "" && this.state.lastName !== "") {
+            this.setState({
+                collegeEmail: this.state.firstName[0] + this.state.lastName.replace(/\s+/g, '') + this.state.studentNumber.slice(-4) + "@conestogac.on.ca",
+            });
+        }
     }
 
     handleStudentIDChange(event) {
@@ -172,8 +179,8 @@ export default class AddMemberDialog extends Component {
                     </Row>
 
 
+                    <Input type="submit" value="Add Member" hidden /> 
                     {/* 
-                    <Input type="submit" value="Add Member" /> 
                     <Input type="button" value="popover" onClick={() => {this.setState({isLastNamePopoverOpen: true})}} /> 
                     */}
                 </Form>

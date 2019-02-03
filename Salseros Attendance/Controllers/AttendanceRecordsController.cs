@@ -68,14 +68,18 @@ namespace Salseros_Attendance.Controllers
 
 
 
-			//Get Attending Members
-			var attendanceResults = _context.AttendanceRecords.Where(x => x.EventID == @event.EventID).Select(x => x.MemberID);
+            //Get Attending Members
+            //Sort those members in reverse chronological order
+            var test = _context.AttendanceRecords.Where(x => x.EventID == @event.EventID);
+            var test2 = test.OrderByDescending(record => record.Time);
+			var attendanceResults = test2.Select(x => x.MemberID);
+
 
 			IEnumerable<Member> attendingMembers = _context.Members.Where(x => attendanceResults.Any(y => y == x.MemberID));
 
 			results = attendingMembers.Select(x => x.MemberID);
 
-			return results;
+            return attendanceResults; //results;
 		}
 
 		// GET: api/AttendanceRecords

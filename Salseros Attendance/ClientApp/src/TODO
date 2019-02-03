@@ -12,5 +12,15 @@
 - Change student Number to No. (one line)
 - Add margins and padding
 - Change colors of inputs in Add new member dialog to make optional inputs more ignorable.
+- Ask user for verification that first and last names parsed correctly if there are 3 or more words.
+- Replace tabs with spaces in inputbox
+- Change college email input in AddMemberDialog to display the @conestogac.on.ca suffix as a label instead
+- Change attendance to sort members by most recently added (or reverse)
+- Change members list to show common users first
+- Change members list to show streaks? Attendance counters?
+- Add success alert when a member attendance is added.
 
 - Add prompt before creating a new event for new today.
+- Add editing of member info
+- Refactor to use Redux
+- Add support for more than one event in a day.

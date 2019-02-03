@@ -15,6 +15,8 @@ namespace SalserosAttendance.Models
         public int EventID { get; set; }
         
         public int MemberID { get; set; }
+
+        public DateTime Time { get; set; }
     }
 
 	public class AttendanceRecordEqualityComparer : IEqualityComparer<AttendanceRecord>
