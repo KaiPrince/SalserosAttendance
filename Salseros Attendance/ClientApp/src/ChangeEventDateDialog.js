@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Container, Row, Col, InputGroup, InputGroupAddon, InputGroupText, Input, Form, FormGroup, Popover, PopoverHeader, PopoverBody } from 'reactstrap';
+import { Container, Row, Col, InputGroup, Input, Form, FormGroup } from 'reactstrap';
 
 export default class ChangeEventDateDialog extends Component {
     constructor(props) {
@@ -12,7 +12,7 @@ export default class ChangeEventDateDialog extends Component {
     }
 
     componentDidMount() {
-        
+
         var today = new Date();
         var month = (today.getMonth() + 1);
         if (month < 10) {
@@ -40,7 +40,7 @@ export default class ChangeEventDateDialog extends Component {
         var eventID = 0;
         //Find event ID based on date chosen.
         console.log(this.props.allEvents);
-        var matchingEvents = this.props.allEvents.filter(event => event.date === date+"T00:00:00");
+        var matchingEvents = this.props.allEvents.filter(event => event.date === date + "T00:00:00");
         console.log(matchingEvents);
 
         if (matchingEvents.length === 1) {
@@ -48,14 +48,14 @@ export default class ChangeEventDateDialog extends Component {
             this.props.handleLoadEvent(eventID);
 
         } else if (matchingEvents.length === 0) {
-            //Create new event
+            //Create new event TODO: use function from parent
             let event = {
                 title: "Salsa Class",
                 date: date
             };
-    
+
             let messageBody = event;
-    
+
             fetch(`api/Events/`,
                 {
                     method: "POST",
@@ -86,18 +86,21 @@ export default class ChangeEventDateDialog extends Component {
 
     render() {
         return (
-            <div className="ChangeEventDateDialog" >
-                <Form onSubmit={this.handleSubmit}>
-                    <Row form>
-                        <Col>
-                            <FormGroup>
-                                <InputGroup size="lg">
-                                    <Input type="date" innerRef={this.datePicker}/>
-                                </InputGroup>
-                            </FormGroup>
-                        </Col>
-                    </Row>
-                </Form>
+            <div id="ChangeEventDateDialog" >
+                <Container>
+                    <Form onSubmit={this.handleSubmit}>
+                        <Row form>
+                            <Col>
+                                <FormGroup>
+                                    <InputGroup size="lg">
+                                        <Input type="date" innerRef={this.datePicker} />
+                                    </InputGroup>
+                                </FormGroup>
+                            </Col>
+                        </Row>
+                        <Input hidden type="submit" value="Submit" />
+                    </Form>
+                </Container>
             </div>
         )
     }

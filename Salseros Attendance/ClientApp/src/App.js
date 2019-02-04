@@ -1,14 +1,6 @@
 ﻿import React from 'react';
-import { Route } from 'react-router';
-import Layout from './components/Layout';
-import Home from './components/Home';
-import Counter from './components/Counter';
-import FetchData from './components/FetchData';
-import Attendance from './components/Attendance';
-import Tutorial from './components/Tutorial';
+/* import { Route } from 'react-router'; */
 import SignInPage from './SignInPage';
-import { Card, CardImg, CardText, CardBody,
-  CardTitle, CardSubtitle, Button } from 'reactstrap';
 
 /* export default () => (
     <Layout>

@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
-import { Container, Row, Col, InputGroup, InputGroupAddon, InputGroupText, Input, Form, FormGroup, Popover, PopoverHeader, PopoverBody } from 'reactstrap';
+import { Container, Row, Col, InputGroup, InputGroupAddon, Input, Form, FormGroup, Popover, PopoverHeader, PopoverBody } from 'reactstrap';
 
 export default class AddMemberDialog extends Component {
     constructor(props) {
@@ -31,12 +30,12 @@ export default class AddMemberDialog extends Component {
         if (this.props.firstName === null || this.props.firstName === undefined) {
             this.firstNameTextBox.current.focus();
         } else if (this.props.lastName === null || this.props.lastName === undefined) {
-            this.setState({isLastNamePopoverOpen: true});
+            this.setState({ isLastNamePopoverOpen: true });
             this.lastNameTextBox.current.focus();
         } else if (this.props.studentNumber === null) {
             setTimeout(() => {
-                this.setState({isStudentIDPopoverOpen: true});
-                
+                this.setState({ isStudentIDPopoverOpen: true });
+
             }, 200);
             this.studentNumberTextBox.current.focus();
         } else {
@@ -48,7 +47,7 @@ export default class AddMemberDialog extends Component {
         this.focusInputElement();
 
         if (this.state.studentNumber !== null && this.state.studentNumber !== undefined && this.state.studentNumber !== ""
-        && this.state.firstName !== "" && this.state.lastName !== "") {
+            && this.state.firstName !== "" && this.state.lastName !== "") {
             this.setState({
                 collegeEmail: this.state.firstName[0] + this.state.lastName.replace(/\s+/g, '') + this.state.studentNumber.slice(-4) + "@conestogac.on.ca",
             });
@@ -105,85 +104,80 @@ export default class AddMemberDialog extends Component {
     }
 
     render() {
-        let lastNameFocus = false;
-        let studentNumberFocus = false;
-        if (this.props.lastName === null || this.props.lastName === undefined) {
-            lastNameFocus = true;
-        } else if (this.props.studentNumber === null) {
-            studentNumberFocus = true;
-        }
 
         return (
-            <div className="AddMemberDialog">
-
-                <Form onSubmit={this.handleSubmit}>
-                    <Row form>
-                        <Col>
-                            <FormGroup>
-                                <InputGroup size="sm">
-                                    <InputGroupAddon addonType="prepend">First Name:</InputGroupAddon>
-                                    <Input name="firstName" placeholder="First Name" type="text" innerRef={this.firstNameTextBox} value={this.state.firstName} onChange={this.handleInputChange} required />
-                                </InputGroup>
-                            </FormGroup>
-                        </Col>
-                        <Col>
-                            <FormGroup>
-                                <InputGroup size="sm">
-                                    <InputGroupAddon addonType="prepend">Last Name:</InputGroupAddon>
-                                    <Input name="lastName" autoFocus={lastNameFocus} placeholder="Last Name" innerRef={this.lastNameTextBox} type="text" value={this.state.lastName} onChange={this.handleInputChange} required />
-                                </InputGroup>
-                            </FormGroup>
-                        </Col>
-                    </Row>
-                    <Row form>
-                        <Col>
-                            <FormGroup>
-                                <InputGroup size="sm">
-                                    <InputGroupAddon addonType="prepend">Student ID:</InputGroupAddon>
-                                    <Input name="studentNumber" autoFocus={studentNumberFocus} placeholder="Student ID" innerRef={this.studentNumberTextBox} type="text" value={this.state.studentNumber} onChange={this.handleStudentIDChange} onBlur={() => this.setState({isStudentIDPopoverOpen: false})} required />
-                                </InputGroup>
-                                <Popover /* trigger="focus" */ placement="bottom" isOpen={this.state.isStudentIDPopoverOpen} target={this.studentNumberTextBox} toggle={() => {this.setState({isStudentIDPopoverOpen: !this.state.isStudentIDPopoverOpen})}}>
-                                    <PopoverHeader>
-                                        Just one more thing...
+            <div id="AddMemberDialog">
+                <Container>
+                    <Form onSubmit={this.handleSubmit}>
+                        <Row form>
+                            <Col>
+                                <FormGroup>
+                                    <InputGroup size="sm">
+                                        <InputGroupAddon addonType="prepend">First Name:</InputGroupAddon>
+                                        <Input name="firstName" placeholder="First Name" type="text" innerRef={this.firstNameTextBox} value={this.state.firstName} onChange={this.handleInputChange} required />
+                                    </InputGroup>
+                                </FormGroup>
+                            </Col>
+                            <Col>
+                                <FormGroup>
+                                    <InputGroup size="sm">
+                                        <InputGroupAddon addonType="prepend">Last Name:</InputGroupAddon>
+                                        <Input name="lastName" placeholder="Last Name" innerRef={this.lastNameTextBox} type="text" value={this.state.lastName} onChange={this.handleInputChange} required />
+                                    </InputGroup>
+                                </FormGroup>
+                            </Col>
+                        </Row>
+                        <Row form>
+                            <Col>
+                                <FormGroup>
+                                    <InputGroup size="sm">
+                                        <InputGroupAddon addonType="prepend">Student ID:</InputGroupAddon>
+                                        <Input name="studentNumber" placeholder="Student ID" innerRef={this.studentNumberTextBox} type="text" value={this.state.studentNumber} onChange={this.handleStudentIDChange} onBlur={() => this.setState({ isStudentIDPopoverOpen: false })} required />
+                                    </InputGroup>
+                                    <Popover /* trigger="focus" */ placement="bottom" isOpen={this.state.isStudentIDPopoverOpen} target={this.studentNumberTextBox} toggle={() => { this.setState({ isStudentIDPopoverOpen: !this.state.isStudentIDPopoverOpen }) }}>
+                                        <PopoverHeader>
+                                            Just one more thing...
                                     </PopoverHeader>
-                                    <PopoverBody>
-                                        Type your student ID and press enter.
+                                        <PopoverBody>
+                                            Type your student ID and press enter.
                                     </PopoverBody>
-                                </Popover>
-                            </FormGroup>
-                        </Col>
-                        <Col>
-                            <FormGroup>
-                                <InputGroup size="sm">
-                                    <InputGroupAddon addonType="prepend">College Email:</InputGroupAddon>
-                                    <Input name="collegeEmail" placeholder="College Email" innerRef={this.collegeEmailTextBox} type="text" value={this.state.collegeEmail} onChange={this.handleInputChange} required />
-                                </InputGroup>
-                            </FormGroup>
-                        </Col>
-                    </Row>
-                    <Row form>
-                        <Col>
-                            <FormGroup>
-                                <InputGroup size="sm">
-                                    <InputGroupAddon addonType="prepend">Contact Email:</InputGroupAddon>
-                                    <Input name="contactEmail" placeholder="Contact Email" type="text" value={this.state.contactEmail} onChange={this.handleInputChange} />
-                                </InputGroup>
-                            </FormGroup>
-                            <FormGroup>
-                                <InputGroup size="sm">
-                                    <InputGroupAddon addonType="prepend">Phone Number:</InputGroupAddon>
-                                    <Input name="phoneNumber" placeholder="Phone Number" type="text" value={this.state.phoneNumber} onChange={this.handleInputChange} />
-                                </InputGroup>
-                            </FormGroup>
-                        </Col>
-                    </Row>
+                                    </Popover>
+                                </FormGroup>
+                            </Col>
+                            <Col>
+                                <FormGroup>
+                                    <InputGroup size="sm">
+                                        <InputGroupAddon addonType="prepend">College Email:</InputGroupAddon>
+                                        <Input name="collegeEmail" placeholder="College Email" innerRef={this.collegeEmailTextBox} type="text" value={this.state.collegeEmail} onChange={this.handleInputChange} required />
+                                        <InputGroupAddon addonType="append">@conestogac.on.ca</InputGroupAddon>
+                                    </InputGroup>
+                                </FormGroup>
+                            </Col>
+                        </Row>
+                        <Row form>
+                            <Col>
+                                <FormGroup>
+                                    <InputGroup size="sm">
+                                        <InputGroupAddon addonType="prepend">Contact Email:</InputGroupAddon>
+                                        <Input name="contactEmail" placeholder="Contact Email" type="text" value={this.state.contactEmail} onChange={this.handleInputChange} />
+                                    </InputGroup>
+                                </FormGroup>
+                                <FormGroup>
+                                    <InputGroup size="sm">
+                                        <InputGroupAddon addonType="prepend">Phone Number:</InputGroupAddon>
+                                        <Input name="phoneNumber" placeholder="Phone Number" type="text" value={this.state.phoneNumber} onChange={this.handleInputChange} />
+                                    </InputGroup>
+                                </FormGroup>
+                            </Col>
+                        </Row>
 
 
-                    <Input type="submit" value="Add Member" hidden /> 
-                    {/* 
+                        <Input type="submit" value="Add Member" hidden />
+                        {/* 
                     <Input type="button" value="popover" onClick={() => {this.setState({isLastNamePopoverOpen: true})}} /> 
                     */}
-                </Form>
+                    </Form>
+                </Container>
             </div>
         );
     }

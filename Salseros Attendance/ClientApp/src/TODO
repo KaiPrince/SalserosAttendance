@@ -1,5 +1,4 @@
 - Add colour and Logo
-- Handle student number in input box
 - Regenerate conestoga email regardless of sequence of inputs
 - Add enter button to search box (or GO)
 - Edit button for members (pencil icon)
@@ -8,7 +7,7 @@
 - Remove options column header
 - Change student Number to No. (one line)
 - Add margins and padding to top
-- Change colors of inputs in Add new member dialog to make optional inputs more ignorable.
+- Change colors of inputs in Add new member dialog to make optional inputs more ignorable. (Tooltips?)
 - Ask user for verification that first and last names parsed correctly if there are 3 or more words.
 - Replace tabs with spaces in inputbox
 - Change college email input in AddMemberDialog to display the @conestogac.on.ca suffix as a label instead

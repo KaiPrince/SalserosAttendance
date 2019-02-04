@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
 import AddMemberDialog from './AddMemberDialog';
 import ChangeEventDateDialog from './ChangeEventDateDialog';
 import CreatableSelect from 'react-select/lib/Creatable';
-import { Container, Row, Col, Button, FormGroup, Label, InputGroup, InputGroupAddon, InputGroupText, Input, Table, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
+import { Container, Row, Col, Button, Input, Table, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 
 
 export default class SignInPage extends Component {
@@ -28,7 +27,6 @@ export default class SignInPage extends Component {
         this.changeEventDateDialogRef = React.createRef();
 
         this.handleChange = this.handleChange.bind(this);
-        this.handleInputChange = this.handleInputChange.bind(this); //TODO: remove?
         this.handleCreate = this.handleCreate.bind(this);
         this.addMember = this.addMember.bind(this);
         this.removeMemberFromAttendance = this.removeMemberFromAttendance.bind(this);
@@ -44,7 +42,7 @@ export default class SignInPage extends Component {
 
     componentDidMount() {
 
-        if (!this.state.showAddMemberDialog) {
+        if (!this.state.showAddMemberDialog && !this.state.showChangeEventDateModal) {
             this.SignInTextBox.current.focus();
         }
 
@@ -295,10 +293,6 @@ export default class SignInPage extends Component {
 
     }
 
-    handleInputChange = (inputValue, actionMeta) => {
-
-    }
-
     handleChange = (newValue) => {
         if (newValue !== null && newValue !== undefined) {
             //Add member to attendance list.
@@ -366,103 +360,103 @@ export default class SignInPage extends Component {
         });
         //TODO: optimize.
         let attendingMembers = []; //this.state.membersList.filter(member => this.state.attendanceList.includes(member.memberID));
-        this.state.attendanceList.forEach(memberID => attendingMembers.push(this.state.membersList.find(member => member.memberID == memberID)));
+        this.state.attendanceList.forEach(memberID => attendingMembers.push(this.state.membersList.find(member => member.memberID === memberID)));
 
         return (
-            <div className="SignInPage">
-                <Container fluid>
+            <div id="SignInPage" className="p-4 ">
+                <Container >
                     <Row>
-                        <Col sm="2">
+                        <Col>
                             <Button color="secondary" onClick={() => {this.loadAllEvents(); this.ChangeEventDateModalToggle()}} >Change Date</Button>
                                 
-                            <Row>
-                                <div className="ChangeEventDateModal">
-                                    <Modal isOpen={this.state.showChangeEventDateModal} toggle={this.ChangeEventDateModalToggle} onOpened={() => { }}>
-                                        <ModalHeader toggle={this.ChangeEventDateModalToggle}>Change Event</ModalHeader>
-                                        <ModalBody>
-                                            <ChangeEventDateDialog ref={this.changeEventDateDialogRef} handleLoadEvent={this.loadEventByID} allEvents={this.state.allEvents}/>
-                                        </ModalBody>
-                                        <ModalFooter>
-                                            <Button color="primary" onClick={(event) => this.changeEventDateDialogRef.current.handleSubmit(event)}>Done</Button>
-                                            <Button color="secondary" onClick={this.ChangeEventDateModalToggle}>Cancel</Button>
-                                        </ModalFooter>
-                                    </Modal>
-                                </div>
-                            </Row>
+                            <Modal id="ChangeEventDateModal" isOpen={this.state.showChangeEventDateModal} toggle={this.ChangeEventDateModalToggle} onOpened={() => { }}>
+                                <ModalHeader toggle={this.ChangeEventDateModalToggle}>Change Event</ModalHeader>
+                                <ModalBody>
+                                    <ChangeEventDateDialog ref={this.changeEventDateDialogRef} handleLoadEvent={this.loadEventByID} allEvents={this.state.allEvents}/>
+                                </ModalBody>
+                                <ModalFooter>
+                                    <Button color="primary" onClick={(event) => this.changeEventDateDialogRef.current.handleSubmit(event)}>Done</Button>
+                                    <Button color="secondary" onClick={this.ChangeEventDateModalToggle}>Cancel</Button>
+                                </ModalFooter>
+                            </Modal>
                         </Col>
                         <Col lg="8">
-                            <Row>
-
-                                <h1 className="mx-auto">Salseros Attendance - Sign-in page</h1>
-
-                            </Row>
-                            <Row>
-
-                                <Col>
-
-                                    <CreatableSelect
-                                        id="SignInTextBox"
-                                        ref={this.SignInTextBox}
-                                        placeholder="Enter your name or student number..."
-                                        isClearable
-                                        onCreateOption={this.handleCreate}
-                                        onChange={this.handleChange}
-                                        options={dropdownOptions}
-                                        value={this.state.SignInTextBoxValue}
-                                        formatCreateLabel={(inputValue) => {return "New Member? Click here."}}
-                                        onInputChange={this.handleInputChange} //TODO: Remove this and the create button?
-                                    />
-
-                                </Col>
-                                {/* <Col sm="2">
-                                    <Button color="primary" onClick={() => {this.handleCreate(this.SignInTextBox.value)}}>Create</Button>
-                                </Col> */}
-
-                            </Row>
-                            <Row>
-                                <Col md>
-                                    <div className="AddMemberModal">
-                                        <Modal isOpen={this.state.showAddMemberDialog} toggle={this.toggle} onOpened={() => { this.addMemberDialogRef.current.focusInputElement() }}>
-                                            <ModalHeader toggle={this.toggle}>Add new member</ModalHeader>
-                                            <ModalBody>
-                                                <AddMemberDialog {...this.state.memberToAdd} ref={this.addMemberDialogRef} handleAddMember={this.addMember} />
-                                            </ModalBody>
-                                            <ModalFooter>
-                                                <Button color="primary" onClick={(event) => this.addMemberDialogRef.current.handleSubmit(event)}>Done</Button>
-                                                <Button color="secondary" onClick={this.toggle}>Cancel</Button>
-                                            </ModalFooter>
-                                        </Modal>
-                                    </div>
-                                </Col>
-                            </Row>
-                            <Row>
-                                <Table>
-                                    <thead>
-                                        <tr>
-                                            <th>Name</th>
-                                            <th>Student Number</th>
-                                            <th>College Email</th>
-                                            <th>Contact Email</th>
-                                            <th>Options</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {(this.state.attendanceList.length === 0) &&
-                                            <tr><td colSpan="5"><p className="mx-auto text-muted">No one's here yet...</p></td></tr>
-                                        }
-                                        {attendingMembers.map((member) => <tr key={member.memberID}>
-                                            <td>{member.firstName} {member.lastName}</td>
-                                            <td>{member.studentNumber}</td>
-                                            <td>{member.collegeEmail}</td>
-                                            <td>{member.contactEmail}</td>
-                                            <td><Input type="button" value="Remove" onClick={() => this.removeMemberFromAttendance(member.memberID)} /></td>
-                                        </tr>
-                                        )}
-                                    </tbody>
-                                </Table>
-                            </Row>
+                            <h1>Salseros Attendance - Sign-in page</h1>
                         </Col>
-                        <Col sm="2"></Col>
+                        <Col>
+                        </Col>
+
+                    </Row>
+                    <Row className="py-4">
+                        <Col>
+                            
+                        </Col>
+                        <Col lg="8">
+
+                            <CreatableSelect
+                                id="SignInTextBox"
+                                ref={this.SignInTextBox}
+                                placeholder="Enter your name or student number..."
+                                isClearable
+                                onCreateOption={this.handleCreate}
+                                onChange={this.handleChange}
+                                options={dropdownOptions}
+                                value={this.state.SignInTextBoxValue}
+                                formatCreateLabel={(inputValue) => {return "New Member? Click here."}}
+                            />
+
+                            {/* <Col sm="2">
+                                <Button color="primary" onClick={() => {this.handleCreate(this.SignInTextBox.value)}}>Create</Button>
+                            </Col> */}
+                            <div className="AddMemberModal">
+                                <Modal isOpen={this.state.showAddMemberDialog} toggle={this.toggle} onOpened={() => { this.addMemberDialogRef.current.focusInputElement() }}>
+                                    <ModalHeader toggle={this.toggle}>Add new member</ModalHeader>
+                                    <ModalBody>
+                                        <AddMemberDialog {...this.state.memberToAdd} ref={this.addMemberDialogRef} handleAddMember={this.addMember} />
+                                    </ModalBody>
+                                    <ModalFooter>
+                                        <Button color="primary" onClick={(event) => this.addMemberDialogRef.current.handleSubmit(event)}>Done</Button>
+                                        <Button color="secondary" onClick={this.toggle}>Cancel</Button>
+                                    </ModalFooter>
+                                </Modal>
+                            </div>
+                            
+                        </Col>
+                        <Col>
+                        {/* There could be a streaks or high scores widget here */}
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col>
+                        </Col>
+                        <Col lg="8">
+                            <Table>
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Student Number</th>
+                                        <th>College Email</th>
+                                        <th>Contact Email</th>
+                                        <th>Options</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {(this.state.attendanceList.length === 0) &&
+                                        <tr><td colSpan="5"><p className="mx-auto text-muted">No one's here yet...</p></td></tr>
+                                    }
+                                    {attendingMembers.map((member) => <tr key={member.memberID}>
+                                        <td>{member.firstName} {member.lastName}</td>
+                                        <td>{member.studentNumber}</td>
+                                        <td>{member.collegeEmail}</td>
+                                        <td>{member.contactEmail}</td>
+                                        <td><Input type="button" value="Remove" onClick={() => this.removeMemberFromAttendance(member.memberID)} /></td>
+                                    </tr>
+                                    )}
+                                </tbody>
+                            </Table>
+                        </Col>
+                        <Col>
+                        </Col>
                     </Row>
                 </Container>
             </div>
