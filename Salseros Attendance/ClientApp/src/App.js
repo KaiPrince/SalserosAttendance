@@ -1,6 +1,10 @@
 ﻿import React from 'react';
 /* import { Route } from 'react-router'; */
 import SignInPage from './SignInPage';
+/* import { library } from '@fortawesome/fontawesome-svg-core';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faIgloo } from '@fortawesome/free-solid-svg-icons';
+library.add(faIgloo); */
 
 /* export default () => (
     <Layout>

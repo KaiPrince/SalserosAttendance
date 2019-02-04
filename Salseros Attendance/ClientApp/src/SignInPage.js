@@ -3,6 +3,9 @@ import AddMemberDialog from './AddMemberDialog';
 import ChangeEventDateDialog from './ChangeEventDateDialog';
 import CreatableSelect from 'react-select/lib/Creatable';
 import { Container, Row, Col, Button, Input, Table, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTrashAlt, faUserEdit, faCalendarDay } from '@fortawesome/free-solid-svg-icons';
+import banner from './images/Cover Logo_uncropped.jpg';
 
 
 export default class SignInPage extends Component {
@@ -358,38 +361,28 @@ export default class SignInPage extends Component {
         membersList.forEach(member => {
             dropdownOptions.push({ id: member.memberID, value: member.studentNumber.toString(), label: member.firstName + " " + member.lastName })
         });
-        //TODO: optimize.
-        let attendingMembers = []; //this.state.membersList.filter(member => this.state.attendanceList.includes(member.memberID));
-        this.state.attendanceList.forEach(memberID => attendingMembers.push(this.state.membersList.find(member => member.memberID === memberID)));
-
+        let attendingMembers = [];
+        this.state.attendanceList.forEach(memberID => {
+            let matchingMember = this.state.membersList.find(member => member.memberID === memberID);
+            if (matchingMember !== undefined && matchingMember !== null) {
+                attendingMembers.push(matchingMember);
+            }
+        });
         return (
-            <div id="SignInPage" className="p-4 ">
-                <Container >
+            <div id="SignInPage" className="">
+                <Container fluid>
                     <Row>
                         <Col>
-                            <Button color="secondary" onClick={() => {this.loadAllEvents(); this.ChangeEventDateModalToggle()}} >Change Date</Button>
-                                
-                            <Modal id="ChangeEventDateModal" isOpen={this.state.showChangeEventDateModal} toggle={this.ChangeEventDateModalToggle} onOpened={() => { }}>
-                                <ModalHeader toggle={this.ChangeEventDateModalToggle}>Change Event</ModalHeader>
-                                <ModalBody>
-                                    <ChangeEventDateDialog ref={this.changeEventDateDialogRef} handleLoadEvent={this.loadEventByID} allEvents={this.state.allEvents}/>
-                                </ModalBody>
-                                <ModalFooter>
-                                    <Button color="primary" onClick={(event) => this.changeEventDateDialogRef.current.handleSubmit(event)}>Done</Button>
-                                    <Button color="secondary" onClick={this.ChangeEventDateModalToggle}>Cancel</Button>
-                                </ModalFooter>
-                            </Modal>
+                            {/* <h1 className="display-4">Sign-in Page</h1> */}
+                            <img src={banner} className="img-fluid rounded"/>
+                            {/* {this.state.event !== null ? this.state.event.title : "Salseros Attendance"} */}
                         </Col>
-                        <Col lg="8">
-                            <h1>Salseros Attendance - Sign-in page</h1>
-                        </Col>
-                        <Col>
-                        </Col>
-
                     </Row>
                     <Row className="py-4">
                         <Col>
-                            
+                            <Button color="secondary" outline className="" onClick={() => {this.loadAllEvents(); this.ChangeEventDateModalToggle()}} >
+                                <FontAwesomeIcon icon={faCalendarDay} />
+                            </Button>
                         </Col>
                         <Col lg="8">
 
@@ -402,24 +395,13 @@ export default class SignInPage extends Component {
                                 onChange={this.handleChange}
                                 options={dropdownOptions}
                                 value={this.state.SignInTextBoxValue}
-                                formatCreateLabel={(inputValue) => {return "New Member? Click here."}}
+                                formatCreateLabel={(inputValue) => {return <p className="text-danger text-decoration-none my-auto">New Member? Click here.</p>}}
                             />
 
                             {/* <Col sm="2">
                                 <Button color="primary" onClick={() => {this.handleCreate(this.SignInTextBox.value)}}>Create</Button>
                             </Col> */}
-                            <div className="AddMemberModal">
-                                <Modal isOpen={this.state.showAddMemberDialog} toggle={this.toggle} onOpened={() => { this.addMemberDialogRef.current.focusInputElement() }}>
-                                    <ModalHeader toggle={this.toggle}>Add new member</ModalHeader>
-                                    <ModalBody>
-                                        <AddMemberDialog {...this.state.memberToAdd} ref={this.addMemberDialogRef} handleAddMember={this.addMember} />
-                                    </ModalBody>
-                                    <ModalFooter>
-                                        <Button color="primary" onClick={(event) => this.addMemberDialogRef.current.handleSubmit(event)}>Done</Button>
-                                        <Button color="secondary" onClick={this.toggle}>Cancel</Button>
-                                    </ModalFooter>
-                                </Modal>
-                            </div>
+                            
                             
                         </Col>
                         <Col>
@@ -428,16 +410,14 @@ export default class SignInPage extends Component {
                     </Row>
                     <Row>
                         <Col>
-                        </Col>
-                        <Col lg="8">
-                            <Table>
+                            <Table responsive>
                                 <thead>
                                     <tr>
                                         <th>Name</th>
-                                        <th>Student Number</th>
+                                        <th>Student #</th>
                                         <th>College Email</th>
                                         <th>Contact Email</th>
-                                        <th>Options</th>
+                                        <th></th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -449,16 +429,45 @@ export default class SignInPage extends Component {
                                         <td>{member.studentNumber}</td>
                                         <td>{member.collegeEmail}</td>
                                         <td>{member.contactEmail}</td>
-                                        <td><Input type="button" value="Remove" onClick={() => this.removeMemberFromAttendance(member.memberID)} /></td>
+                                        <td>
+                                            {/* <Button outline color="secondary" size="sm" >
+                                                <FontAwesomeIcon icon={faUserEdit} fixedWidth />
+                                            </Button> */}
+                                            <Button outline color="secondary" size="sm" onClick={() => this.removeMemberFromAttendance(member.memberID)} >
+                                                <FontAwesomeIcon icon={faTrashAlt} fixedWidth />
+                                            </Button>
+                                        </td>
                                     </tr>
                                     )}
                                 </tbody>
                             </Table>
                         </Col>
-                        <Col>
-                        </Col>
                     </Row>
                 </Container>
+                <div id="allModals" >
+                    <Modal id="ChangeEventDateModal" isOpen={this.state.showChangeEventDateModal} toggle={this.ChangeEventDateModalToggle} onOpened={() => { }}>
+                        <ModalHeader toggle={this.ChangeEventDateModalToggle}>Change Event</ModalHeader>
+                        <ModalBody>
+                            <ChangeEventDateDialog ref={this.changeEventDateDialogRef} handleLoadEvent={this.loadEventByID} allEvents={this.state.allEvents}/>
+                        </ModalBody>
+                        <ModalFooter>
+                            <Button color="primary" onClick={(event) => this.changeEventDateDialogRef.current.handleSubmit(event)}>Done</Button>
+                            <Button color="secondary" onClick={this.ChangeEventDateModalToggle}>Cancel</Button>
+                        </ModalFooter>
+                    </Modal>
+
+                    <Modal id="AddMemberModal" isOpen={this.state.showAddMemberDialog} toggle={this.toggle} onOpened={() => { this.addMemberDialogRef.current.focusInputElement() }}>
+                        <ModalHeader toggle={this.toggle}>Add new member</ModalHeader>
+                        <ModalBody>
+                            <AddMemberDialog {...this.state.memberToAdd} ref={this.addMemberDialogRef} handleAddMember={this.addMember} />
+                        </ModalBody>
+                        <ModalFooter>
+                            <Button color="primary" onClick={(event) => this.addMemberDialogRef.current.handleSubmit(event)}>Done</Button>
+                            <Button color="secondary" onClick={this.toggle}>Cancel</Button>
+                        </ModalFooter>
+                    </Modal>
+                </div>
+                
             </div>
         )
     }

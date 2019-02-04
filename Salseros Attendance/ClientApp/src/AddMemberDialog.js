@@ -149,7 +149,7 @@ export default class AddMemberDialog extends Component {
                                     <InputGroup size="sm">
                                         <InputGroupAddon addonType="prepend">College Email:</InputGroupAddon>
                                         <Input name="collegeEmail" placeholder="College Email" innerRef={this.collegeEmailTextBox} type="text" value={this.state.collegeEmail} onChange={this.handleInputChange} required />
-                                        <InputGroupAddon addonType="append">@conestogac.on.ca</InputGroupAddon>
+                                        {/* <InputGroupAddon addonType="append">@conestogac.on.ca</InputGroupAddon> */}
                                     </InputGroup>
                                 </FormGroup>
                             </Col>
