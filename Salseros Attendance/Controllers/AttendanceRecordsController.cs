@@ -89,6 +89,20 @@ namespace Salseros_Attendance.Controllers
 			return _context.AttendanceRecords.ToList();
 		}
 
+        [HttpGet("score")]
+        public IEnumerable<Score> GetAttendanceScores()
+        {
+
+            List<Score> memberScores = new List<Score> { };
+            foreach (var member in _context.Members)
+            {
+                int score = 0;
+                score = _context.AttendanceRecords.Where(x => x.MemberID == member.MemberID).Count();
+                memberScores.Add(new Score { MemberID = member.MemberID, MemberScore = score });
+            }
+            return memberScores;
+        }
+
 		[HttpPost("[action]")]
 		public async Task<IActionResult> AttendEvent([FromBody] AttendanceRecord attendanceRecord)
 		{
