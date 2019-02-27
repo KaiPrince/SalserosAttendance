@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import AddMemberDialog from './AddMemberDialog';
 import ChangeEventDateDialog from './ChangeEventDateDialog';
 import CreatableSelect from 'react-select/lib/Creatable';
-import { Container, Row, Col, Button, Input, Table, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
+import { Container, Row, Col, Button, Table, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrashAlt, faUserEdit, faCalendarDay } from '@fortawesome/free-solid-svg-icons';
 import banner from './images/Cover Logo_uncropped.jpg';
@@ -18,11 +18,12 @@ export default class SignInPage extends Component {
             showChangeEventDateModal: false,
             memberToAdd: null,
             SignInTextBoxValue: null,
+            SignInTextBoxLastValue: "",
             eventID: null,
             event: null,
             allEvents: null,
-            willAddNewMemberToAttendance: false,
             willCreateNewEvent: false,
+            memberScores: [],
         };
 
         this.SignInTextBox = React.createRef();
@@ -41,42 +42,35 @@ export default class SignInPage extends Component {
         this.toggle = this.toggle.bind(this);
         this.ChangeEventDateModalToggle = this.ChangeEventDateModalToggle.bind(this);
         this.addMemberToAttendance = this.addMemberToAttendance.bind(this);
+        this.loadAllMemberScores = this.loadAllMemberScores.bind(this);
     }
 
-    componentDidMount() {
+    async componentDidMount() {
 
         if (!this.state.showAddMemberDialog && !this.state.showChangeEventDateModal) {
             this.SignInTextBox.current.focus();
         }
 
         //Load all members
-        this.loadAllMembers();
+        await this.loadAllMembers();
 
         //Load today's event
-        this.loadEventByID(this.state.eventID);
+        await this.loadEventByID(this.state.eventID);
 
         //Load current attendance list
-        this.loadAttendanceList(this.state.eventID);
+        await this.loadAttendanceList(this.state.eventID);
+
+        await this.loadAllMemberScores();
 
     }
 
 
-    loadAllMembers() {
+    async loadAllMembers() {
         fetch(`api/members`)
             .then(res => res.json())
             .then(
                 (result) => {
                     this.setState({ membersList: result });
-
-                    if (this.state.willAddNewMemberToAttendance) {
-                        let allIDs = [];
-                        this.state.membersList.forEach(member => {
-                            allIDs.push(member.memberID);
-                        });
-                        let newMemberID = Math.max(...allIDs);
-
-                        this.addMemberToAttendance(this.state.eventID, newMemberID);
-                    }
 
                 },
                 (error) => {
@@ -87,7 +81,7 @@ export default class SignInPage extends Component {
 
     }
 
-    loadEventByID(eventID) {
+    async loadEventByID(eventID) {
         console.log("loading event for " + eventID);
         if (eventID === null || eventID === undefined || eventID === 0) {
 
@@ -104,32 +98,32 @@ export default class SignInPage extends Component {
                                     this.createNewEvent("Salsa Class", date); //TODO: prompt for title
                                 }
                             })
-                        
+
                     },
                     (error) => {
                         console.log(error);
                     }
                 );
         } else {
-            
+
             fetch(`api/Events/` + eventID)
-            .then(res => res.json())
-            .then(
-                (result) => {
-                    console.log(result);
-                    this.setState({ eventID: result.eventID, event: result },
-                        () => {
-                            if (this.state.event === null) {
-                                //TODO: Error message. Handle no event found.
-                            }
-                            this.loadAttendanceList(this.state.eventID); //TODO change functions to await async instead of calling this twice.
-                        })
-                    
-                },
-                (error) => {
-                    console.log(error);
-                }
-            );
+                .then(res => res.json())
+                .then(
+                    (result) => {
+                        console.log(result);
+                        this.setState({ eventID: result.eventID, event: result },
+                            () => {
+                                if (this.state.event === null) {
+                                    //TODO: Error message. Handle no event found.
+                                }
+                                this.loadAttendanceList(this.state.eventID); //TODO change functions to await async instead of calling this twice.
+                            })
+
+                    },
+                    (error) => {
+                        console.log(error);
+                    }
+                );
         }
 
         //TODO: this is handling the behaviour of ChangeEventDialog class. Need to decouple.
@@ -137,26 +131,26 @@ export default class SignInPage extends Component {
         this.SignInTextBox.current.focus();
     }
 
-    loadAllEvents() {
+    async loadAllEvents() {
         fetch(`api/Events/all`)
-                .then(res => res.json())
-                .then(
-                    (result) => {
-                        console.log(result);
-                        this.setState({ allEvents: result },
-                            () => {
-                                if (this.state.allEvents === null) {
-                                    //TODO: handle no events returned error.
-                                }
-                            })
-                    },
-                    (error) => {
-                        console.log(error);
-                    }
-                );
+            .then(res => res.json())
+            .then(
+                (result) => {
+                    console.log(result);
+                    this.setState({ allEvents: result },
+                        () => {
+                            if (this.state.allEvents === null) {
+                                //TODO: handle no events returned error.
+                            }
+                        })
+                },
+                (error) => {
+                    console.log(error);
+                }
+            );
     }
 
-    createNewEvent(title, date) {
+    async createNewEvent(title, date) {
         let event = {
             title: "Salsa Class",
             date: date
@@ -184,40 +178,43 @@ export default class SignInPage extends Component {
             );
     }
 
-    loadAttendanceList(eventID) {
-        
+    async loadAttendanceList(eventID) {
+
         console.log("loading attendance for " + eventID);
         if (eventID === null || eventID === undefined || eventID === 0) {
             fetch(`api/AttendanceRecords/`)
-            .then(res => res.json())
-            .then(
-                (result) => {
-                    this.setState({ attendanceList: result });
-
-                    this.setState({ willAddNewMemberToAttendance: false });
-                },
-                (error) => {
-                    console.log(error);
-                }
-            );
+                .then(res => res.json())
+                .then(
+                    (result) => {
+                        this.setState({ attendanceList: result });
+                    },
+                    (error) => {
+                        console.log(error);
+                    }
+                );
         } else {
             fetch(`api/AttendanceRecords/` + eventID)
-            .then(res => res.json())
-            .then(
-                (result) => {
-                    this.setState({ attendanceList: result });
-
-                    this.setState({ willAddNewMemberToAttendance: false });
-                },
-                (error) => {
-                    console.log(error);
-                }
-            );
+                .then(res => res.json())
+                .then(
+                    (result) => {
+                        this.setState({ attendanceList: result });
+                    },
+                    (error) => {
+                        console.log(error);
+                    }
+                );
         }
-        
+
     }
 
-    addMember(member) {
+    async loadAllMemberScores() {
+        var response = await fetch(`api/AttendanceRecords/score`);
+        var records = await response.json();
+
+        this.setState({ memberScores: records });
+    }
+
+    async addMember(member) {
         //TODO: handle errors and recieve memberID to add to attendance
         let messageBody = JSON.stringify(member);
 
@@ -232,10 +229,16 @@ export default class SignInPage extends Component {
             })
             .then(res => res.json())
             .then(
-                (result) => {
-                    this.setState({ willAddNewMemberToAttendance: true }, () => {
-                        this.loadAllMembers();
-                    });
+                async (result) => {
+                    let member = result;
+                    if (member.memberID === undefined) {
+                        //Add failed!
+                        console.log("Failed to add a member:", result);
+                    } else {
+                        await this.loadAllMembers();
+                        await this.addMemberToAttendance(this.state.eventID, member.memberID);
+                    }
+
 
 
                 },
@@ -248,7 +251,7 @@ export default class SignInPage extends Component {
         this.SignInTextBox.current.focus();
     }
 
-    addMemberToAttendance(eventID, memberID) {
+    async addMemberToAttendance(eventID, memberID) {
         let messageBody = JSON.stringify({ EventID: eventID, MemberID: memberID, Time: new Date() });
         console.log(messageBody);
 
@@ -270,7 +273,7 @@ export default class SignInPage extends Component {
             );
     }
 
-    removeMemberFromAttendance(MemberID) {
+    async removeMemberFromAttendance(MemberID) {
         //Remove member from attendance list.
 
         let messageBody = JSON.stringify({ EventID: this.state.eventID, MemberID: MemberID });
@@ -336,7 +339,7 @@ export default class SignInPage extends Component {
             this.setState({ memberToAdd: { firstName: parsedfirstName, lastName: parsedlastName, studentNumber: parsedstudentID } });
             this.setState({ showAddMemberDialog: true });
         }
-       
+
 
 
 
@@ -374,38 +377,45 @@ export default class SignInPage extends Component {
                     <Row>
                         <Col>
                             {/* <h1 className="display-4">Sign-in Page</h1> */}
-                            <img src={banner} className="img-fluid rounded"/>
+                            <img src={banner} className="img-fluid rounded" alt="Conestoga Salseros" />
                             {/* {this.state.event !== null ? this.state.event.title : "Salseros Attendance"} */}
                         </Col>
                     </Row>
                     <Row className="py-4">
                         <Col>
-                            <Button color="secondary" outline className="" onClick={() => {this.loadAllEvents(); this.ChangeEventDateModalToggle()}} >
+                            <Button color="secondary" outline className="" onClick={() => { this.loadAllEvents(); this.ChangeEventDateModalToggle() }} >
                                 <FontAwesomeIcon icon={faCalendarDay} />
                             </Button>
                         </Col>
                         <Col lg="8">
+                            <Row>
+                                <Col lg>
+                                    <CreatableSelect
+                                        id="SignInTextBox"
+                                        ref={this.SignInTextBox}
+                                        placeholder="Enter your name or student number..."
+                                        isClearable
+                                        onCreateOption={this.handleCreate}
+                                        onChange={this.handleChange}
+                                        onInputChange={(inputValue) => { if (inputValue !== null) this.state.SignInTextBoxLastValue = inputValue; }}
+                                        options={dropdownOptions}
+                                        value={this.state.SignInTextBoxValue}
+                                        formatCreateLabel={(inputValue) => { return <p className="text-danger text-decoration-none my-auto">New Member? Click here.</p> }}
+                                        onBlur={() => { this.state.SignInTextBoxValue = this.state.SignInTextBoxLastValue; }}
+                                    />
+                                </Col>
 
-                            <CreatableSelect
-                                id="SignInTextBox"
-                                ref={this.SignInTextBox}
-                                placeholder="Enter your name or student number..."
-                                isClearable
-                                onCreateOption={this.handleCreate}
-                                onChange={this.handleChange}
-                                options={dropdownOptions}
-                                value={this.state.SignInTextBoxValue}
-                                formatCreateLabel={(inputValue) => {return <p className="text-danger text-decoration-none my-auto">New Member? Click here.</p>}}
-                            />
 
-                            {/* <Col sm="2">
-                                <Button color="primary" onClick={() => {this.handleCreate(this.SignInTextBox.value)}}>Create</Button>
-                            </Col> */}
-                            
-                            
+                                <Col sm="2">
+                                    <Button block color="primary" onClick={() => { this.handleCreate(this.state.SignInTextBoxValue) }}>Create</Button>
+                                </Col>
+                            </Row>
+
+
+
                         </Col>
                         <Col>
-                        {/* There could be a streaks or high scores widget here */}
+                            {/* There could be a streaks or high scores widget here */}
                         </Col>
                     </Row>
                     <Row>
@@ -424,8 +434,8 @@ export default class SignInPage extends Component {
                                     {(this.state.attendanceList.length === 0) &&
                                         <tr><td colSpan="5"><p className="mx-auto text-muted">No one's here yet...</p></td></tr>
                                     }
-                                    {attendingMembers.map((member) => <tr key={member.memberID}>
-                                        <td>{member.firstName} {member.lastName}</td>
+                                    {attendingMembers.map((member, index) => <tr key={member.memberID}>
+                                        <td>{/* {this.state.memberScores.find((item) => {return item.memberID === member.memberID && item.memberScore !== 0}).memberScore} */} {member.firstName} {member.lastName}</td>
                                         <td>{member.studentNumber}</td>
                                         <td>{member.collegeEmail}</td>
                                         <td>{member.contactEmail}</td>
@@ -448,7 +458,7 @@ export default class SignInPage extends Component {
                     <Modal id="ChangeEventDateModal" isOpen={this.state.showChangeEventDateModal} toggle={this.ChangeEventDateModalToggle} onOpened={() => { }}>
                         <ModalHeader toggle={this.ChangeEventDateModalToggle}>Change Event</ModalHeader>
                         <ModalBody>
-                            <ChangeEventDateDialog ref={this.changeEventDateDialogRef} handleLoadEvent={this.loadEventByID} allEvents={this.state.allEvents}/>
+                            <ChangeEventDateDialog ref={this.changeEventDateDialogRef} handleLoadEvent={this.loadEventByID} allEvents={this.state.allEvents} />
                         </ModalBody>
                         <ModalFooter>
                             <Button color="primary" onClick={(event) => this.changeEventDateDialogRef.current.handleSubmit(event)}>Done</Button>
@@ -456,18 +466,19 @@ export default class SignInPage extends Component {
                         </ModalFooter>
                     </Modal>
 
-                    <Modal id="AddMemberModal" isOpen={this.state.showAddMemberDialog} toggle={this.toggle} onOpened={() => { this.addMemberDialogRef.current.focusInputElement() }}>
+                    <Modal id="AddMemberModal" isOpen={this.state.showAddMemberDialog} toggle={this.toggle} /* onOpened={() => { this.addMemberDialogRef.current.focusInputElement() }} */>
                         <ModalHeader toggle={this.toggle}>Add new member</ModalHeader>
                         <ModalBody>
                             <AddMemberDialog {...this.state.memberToAdd} ref={this.addMemberDialogRef} handleAddMember={this.addMember} />
                         </ModalBody>
                         <ModalFooter>
-                            <Button color="primary" onClick={(event) => this.addMemberDialogRef.current.handleSubmit(event)}>Done</Button>
+                            <p className="text-muted font-weight-light text-left mr-5 my-auto">Press enter when you're done.</p>
+                            <Button color="primary" onClick={(event) => this.addMemberDialogRef.current.submitButton.current.click()}>Done</Button>
                             <Button color="secondary" onClick={this.toggle}>Cancel</Button>
                         </ModalFooter>
                     </Modal>
                 </div>
-                
+
             </div>
         )
     }
