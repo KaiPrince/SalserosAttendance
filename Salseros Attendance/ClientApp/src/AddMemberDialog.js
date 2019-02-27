@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
-import { Container, Row, Col, InputGroup, InputGroupAddon, Input, Form, FormGroup, Popover, PopoverHeader, PopoverBody } from 'reactstrap';
+import { Container, Row, Col, InputGroup, InputGroupAddon, Input, Form, FormGroup, Popover, PopoverHeader, PopoverBody, Collapse, Button, UncontrolledTooltip } from 'reactstrap';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faAngleDoubleDown, faAngleDoubleUp } from '@fortawesome/free-solid-svg-icons';
 
 export default class AddMemberDialog extends Component {
     constructor(props) {
@@ -13,16 +15,23 @@ export default class AddMemberDialog extends Component {
             phoneNumber: "",
             isLastNamePopoverOpen: false,
             isStudentIDPopoverOpen: false,
+            isExtraOptionsCollapseOpen: false,
         };
 
         this.firstNameTextBox = React.createRef();
         this.lastNameTextBox = React.createRef();
         this.studentNumberTextBox = React.createRef();
         this.collegeEmailTextBox = React.createRef();
+        this.submitButton = React.createRef();
 
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleInputChange = this.handleInputChange.bind(this);
         this.handleStudentIDChange = this.handleStudentIDChange.bind(this);
+        this.handleLastNameChange = this.handleLastNameChange.bind(this);
+        this.handleGenerateCollegeEmail = this.handleGenerateCollegeEmail.bind(this);
+        this.generateCollegeEmailInputValidation = this.hasValidInputsForGenerateCollegeEmail.bind(this);
+        this.generateCollegeEmail = this.generateCollegeEmail.bind(this);
+        this.isCollegeEmailDisabled = this.isCollegeEmailDisabled.bind(this);
         this.focusInputElement = this.focusInputElement.bind(this);
     }
 
@@ -33,10 +42,8 @@ export default class AddMemberDialog extends Component {
             this.setState({ isLastNamePopoverOpen: true });
             this.lastNameTextBox.current.focus();
         } else if (this.props.studentNumber === null) {
-            setTimeout(() => {
-                this.setState({ isStudentIDPopoverOpen: true });
+            this.setState({ isStudentIDPopoverOpen: true });
 
-            }, 200);
             this.studentNumberTextBox.current.focus();
         } else {
             this.collegeEmailTextBox.current.focus();
@@ -44,30 +51,62 @@ export default class AddMemberDialog extends Component {
     }
 
     componentDidMount() {
-        this.focusInputElement();
+        setTimeout(() => {
+
+            if (this.firstNameTextBox === null || this.firstNameTextBox.current === null) {
+                //ERROR: By the end of the timeout, the modal has disappeared.
+                //TODO: surely there's a better way to determine if this dialog no longer exists.
+                return;
+            }
+
+            this.focusInputElement();
+        }, 550);
 
         if (this.state.studentNumber !== null && this.state.studentNumber !== undefined && this.state.studentNumber !== ""
             && this.state.firstName !== "" && this.state.lastName !== "") {
+            this.generateCollegeEmail();
+        }
+    }
+
+    async handleStudentIDChange(event) {
+        var onlyNumbers = new RegExp('^([0-9])*$');
+        var value = event.target.value;
+        if (value.length <= 7 && onlyNumbers.test(value)) {
+            await this.handleInputChange(event);
+        }
+
+        this.generateCollegeEmail();
+    }
+
+    isCollegeEmailDisabled = () => {
+        return !this.hasValidInputsForGenerateCollegeEmail(this.state);
+    }
+
+    hasValidInputsForGenerateCollegeEmail(state) {
+        return state.studentNumber.length === 7 &&
+            state.firstName !== "" &&
+            state.lastName !== "";
+    }
+
+    generateCollegeEmail() {
+
+        if (this.hasValidInputsForGenerateCollegeEmail(this.state)) {
+
             this.setState({
                 collegeEmail: this.state.firstName[0] + this.state.lastName.replace(/\s+/g, '') + this.state.studentNumber.slice(-4) + "@conestogac.on.ca",
             });
         }
-    }
-
-    handleStudentIDChange(event) {
-        this.handleInputChange(event);
-
-        if (event.target.value.length === 7) {
-
-            this.setState({
-                collegeEmail: this.state.firstName[0] + this.state.lastName + event.target.value.substring(event.target.value.length - 4) + "@conestogac.on.ca",
-            });
-        }
 
 
     }
 
-    handleInputChange(event) {
+    async handleLastNameChange(event) {
+        await this.handleInputChange(event);
+
+        this.generateCollegeEmail();
+    }
+
+    async handleInputChange(event) {
         const target = event.target;
         const value = target.type === 'checkbox' ? target.checked : target.value;
         const name = target.name;
@@ -77,18 +116,21 @@ export default class AddMemberDialog extends Component {
         });
     }
 
+    handleGenerateCollegeEmail() {
+        if (this.state.firstName === "") {
+            this.firstNameTextBox.current.focus();
+        } else if (this.state.lastName === "") {
+            this.lastNameTextBox.current.focus();
+        } else if (this.state.studentNumber === "") {
+            this.studentNumberTextBox.current.focus();
+        } else {
+            this.generateCollegeEmail();
+        }
+
+    }
+
     handleSubmit(event) {
         event.preventDefault();
-
-        //Add member to list.
-        if (this.state.lastName === null || this.state.lastName === undefined) {
-            alert('Must enter a last name');
-            return;
-        }
-        else if (this.state.studentNumber === null || this.state.studentNumber === undefined || this.state.studentNumber === 0) {
-            alert('Must enter a studentNumber');
-            return;
-        }
 
         let member = {
             MemberID: 0,
@@ -108,13 +150,13 @@ export default class AddMemberDialog extends Component {
         return (
             <div id="AddMemberDialog">
                 <Container>
-                    <Form onSubmit={this.handleSubmit}>
+                    <Form onSubmit={this.handleSubmit} >
                         <Row form>
                             <Col>
                                 <FormGroup>
                                     <InputGroup size="sm">
                                         <InputGroupAddon addonType="prepend">First Name:</InputGroupAddon>
-                                        <Input name="firstName" placeholder="First Name" type="text" innerRef={this.firstNameTextBox} value={this.state.firstName} onChange={this.handleInputChange} required />
+                                        <Input name="firstName" placeholder="First Name" type="text" innerRef={this.firstNameTextBox} value={this.state.firstName} onChange={this.handleLastNameChange} required />
                                     </InputGroup>
                                 </FormGroup>
                             </Col>
@@ -122,7 +164,7 @@ export default class AddMemberDialog extends Component {
                                 <FormGroup>
                                     <InputGroup size="sm">
                                         <InputGroupAddon addonType="prepend">Last Name:</InputGroupAddon>
-                                        <Input name="lastName" placeholder="Last Name" innerRef={this.lastNameTextBox} type="text" value={this.state.lastName} onChange={this.handleInputChange} required />
+                                        <Input name="lastName" placeholder="Last Name" type="text" innerRef={this.lastNameTextBox} value={this.state.lastName} onChange={this.handleLastNameChange} required />
                                     </InputGroup>
                                 </FormGroup>
                             </Col>
@@ -130,14 +172,14 @@ export default class AddMemberDialog extends Component {
                         <Row form>
                             <Col>
                                 <FormGroup>
-                                    <InputGroup size="sm">
+                                    <InputGroup size="sm" className="pb-4"> {/* Bottom padding makes room for popover. */}
                                         <InputGroupAddon addonType="prepend">Student ID:</InputGroupAddon>
-                                        <Input name="studentNumber" placeholder="Student ID" innerRef={this.studentNumberTextBox} type="text" value={this.state.studentNumber} onChange={this.handleStudentIDChange} onBlur={() => this.setState({ isStudentIDPopoverOpen: false })} required />
+                                        <Input name="studentNumber" placeholder="Student ID" type="text" innerRef={this.studentNumberTextBox} value={this.state.studentNumber} onChange={this.handleStudentIDChange} required />
                                     </InputGroup>
-                                    <Popover /* trigger="focus" */ placement="bottom" isOpen={this.state.isStudentIDPopoverOpen} target={this.studentNumberTextBox} toggle={() => { this.setState({ isStudentIDPopoverOpen: !this.state.isStudentIDPopoverOpen }) }}>
-                                        <PopoverHeader>
+                                    <Popover trigger="focus" placement="bottom" isOpen={this.state.isStudentIDPopoverOpen} target={this.studentNumberTextBox} toggle={() => { this.setState({ isStudentIDPopoverOpen: !this.state.isStudentIDPopoverOpen }) }}>
+                                        {/* <PopoverHeader>
                                             Just one more thing...
-                                    </PopoverHeader>
+                                        </PopoverHeader> */}
                                         <PopoverBody>
                                             Type your student ID and press enter.
                                     </PopoverBody>
@@ -147,8 +189,11 @@ export default class AddMemberDialog extends Component {
                             <Col>
                                 <FormGroup>
                                     <InputGroup size="sm">
-                                        <InputGroupAddon addonType="prepend">College Email:</InputGroupAddon>
-                                        <Input name="collegeEmail" placeholder="College Email" innerRef={this.collegeEmailTextBox} type="text" value={this.state.collegeEmail} onChange={this.handleInputChange} required />
+                                        <InputGroupAddon addonType="prepend">
+                                            <UncontrolledTooltip target="btnCollegeEmail" trigger="hover focus" placement="auto" >Click to generate.</UncontrolledTooltip>
+                                            <Button id="btnCollegeEmail" onClick={this.handleGenerateCollegeEmail}>College Email:</Button>
+                                        </InputGroupAddon>
+                                        <Input name="collegeEmail" placeholder="College Email" innerRef={this.collegeEmailTextBox} type="text" value={this.state.collegeEmail} onChange={this.handleInputChange} required disabled={this.isCollegeEmailDisabled()} />
                                         {/* <InputGroupAddon addonType="append">@conestogac.on.ca</InputGroupAddon> */}
                                     </InputGroup>
                                 </FormGroup>
@@ -156,26 +201,28 @@ export default class AddMemberDialog extends Component {
                         </Row>
                         <Row form>
                             <Col>
-                                <FormGroup>
-                                    <InputGroup size="sm">
-                                        <InputGroupAddon addonType="prepend">Contact Email:</InputGroupAddon>
-                                        <Input name="contactEmail" placeholder="Contact Email" type="text" value={this.state.contactEmail} onChange={this.handleInputChange} />
-                                    </InputGroup>
-                                </FormGroup>
-                                <FormGroup>
-                                    <InputGroup size="sm">
-                                        <InputGroupAddon addonType="prepend">Phone Number:</InputGroupAddon>
-                                        <Input name="phoneNumber" placeholder="Phone Number" type="text" value={this.state.phoneNumber} onChange={this.handleInputChange} />
-                                    </InputGroup>
-                                </FormGroup>
+                                <Button color="link text-secondary text-decoration-none" id="btnExtraOptionsToggle" onClick={() => { this.setState({ isExtraOptionsCollapseOpen: !this.state.isExtraOptionsCollapseOpen }); }}>
+                                    {!this.state.isExtraOptionsCollapseOpen ? "More" : "Less"} <FontAwesomeIcon icon={!this.state.isExtraOptionsCollapseOpen ? faAngleDoubleDown : faAngleDoubleUp} size="xs" />
+                                </Button>
+                                <Collapse isOpen={this.state.isExtraOptionsCollapseOpen}>
+                                    <FormGroup>
+                                        <InputGroup size="sm">
+                                            <InputGroupAddon addonType="prepend">Contact Email:</InputGroupAddon>
+                                            <Input name="contactEmail" placeholder="Contact Email" type="text" value={this.state.contactEmail} onChange={this.handleInputChange} />
+                                        </InputGroup>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <InputGroup size="sm">
+                                            <InputGroupAddon addonType="prepend">Phone Number:</InputGroupAddon>
+                                            <Input name="phoneNumber" placeholder="Phone Number" type="text" value={this.state.phoneNumber} onChange={this.handleInputChange} />
+                                        </InputGroup>
+                                    </FormGroup>
+                                </Collapse>
                             </Col>
                         </Row>
 
 
-                        <Input type="submit" value="Add Member" hidden />
-                        {/* 
-                    <Input type="button" value="popover" onClick={() => {this.setState({isLastNamePopoverOpen: true})}} /> 
-                    */}
+                        <Input type="submit" value="Add Member" innerRef={this.submitButton} hidden />
                     </Form>
                 </Container>
             </div>
