@@ -371,6 +371,15 @@ export default class SignInPage extends Component {
                 attendingMembers.push(matchingMember);
             }
         });
+
+        //TODO: find a better way to do this, or make a function.
+        function yyyymmdd(date) {
+            function twoDigit(n) { return (n < 10 ? '0' : '') + n; }
+
+            var dateObject = new Date(date);
+            return '' + dateObject.getFullYear() + "-" + twoDigit(dateObject.getMonth() + 1) + "-" + twoDigit(dateObject.getDate());
+        }
+        let currentEventDate = this.state.event !== null? yyyymmdd(this.state.event.date) : null;
         return (
             <div id="SignInPage" className="">
                 <Container fluid>
@@ -387,9 +396,9 @@ export default class SignInPage extends Component {
                                 <FontAwesomeIcon icon={faCalendarDay} />
                             </Button>
                         </Col>
-                        <Col lg="8">
+                        <Col md="8">
                             <Row>
-                                <Col lg>
+                                <Col >
                                     <CreatableSelect
                                         id="SignInTextBox"
                                         ref={this.SignInTextBox}
@@ -461,6 +470,7 @@ export default class SignInPage extends Component {
                             <ChangeEventDateDialog ref={this.changeEventDateDialogRef} handleLoadEvent={this.loadEventByID} allEvents={this.state.allEvents} />
                         </ModalBody>
                         <ModalFooter>
+                            <p className="text-muted font-weight-light text-left mr-5 my-auto">Currently editing event {currentEventDate}.</p>
                             <Button color="primary" onClick={(event) => this.changeEventDateDialogRef.current.handleSubmit(event)}>Done</Button>
                             <Button color="secondary" onClick={this.ChangeEventDateModalToggle}>Cancel</Button>
                         </ModalFooter>
