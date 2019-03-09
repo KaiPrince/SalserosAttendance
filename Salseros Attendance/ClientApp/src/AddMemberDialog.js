@@ -111,6 +111,7 @@ export default class AddMemberDialog extends Component {
         const value = target.type === 'checkbox' ? target.checked : target.value;
         const name = target.name;
 
+
         this.setState({
             [name]: value
         });
@@ -156,7 +157,7 @@ export default class AddMemberDialog extends Component {
                                 <FormGroup>
                                     <InputGroup size="sm">
                                         <InputGroupAddon addonType="prepend">First Name:</InputGroupAddon>
-                                        <Input name="firstName" placeholder="First Name" type="text" innerRef={this.firstNameTextBox} value={this.state.firstName} onChange={this.handleLastNameChange} required />
+                                        <Input name="firstName" placeholder="First Name" type="text" className="text-capitalize" innerRef={this.firstNameTextBox} value={this.state.firstName} onChange={this.handleLastNameChange} required />
                                     </InputGroup>
                                 </FormGroup>
                             </Col>
@@ -164,7 +165,7 @@ export default class AddMemberDialog extends Component {
                                 <FormGroup>
                                     <InputGroup size="sm">
                                         <InputGroupAddon addonType="prepend">Last Name:</InputGroupAddon>
-                                        <Input name="lastName" placeholder="Last Name" type="text" innerRef={this.lastNameTextBox} value={this.state.lastName} onChange={this.handleLastNameChange} required />
+                                        <Input name="lastName" placeholder="Last Name" type="text" className="text-capitalize" innerRef={this.lastNameTextBox} value={this.state.lastName} onChange={this.handleLastNameChange} required />
                                     </InputGroup>
                                 </FormGroup>
                             </Col>

@@ -93,7 +93,14 @@ namespace Salseros_Attendance.Controllers
                 return BadRequest(ModelState);
             }
 
-            _context.Members.Add(member);
+			//Upper case first letter of first and last name.
+			char[] firstletter = member.FirstName.ToCharArray();
+			firstletter[0] = char.ToUpper(firstletter[0]);
+
+			firstletter = member.LastName.ToCharArray();
+			firstletter[0] = char.ToUpper(firstletter[0]);
+
+			_context.Members.Add(member);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetMember", new { id = member.MemberID }, member);
