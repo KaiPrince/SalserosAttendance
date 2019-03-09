@@ -500,7 +500,7 @@ export default class SignInPage extends Component {
                         <ModalFooter>
                             {/* <p className="text-muted font-weight-light text-left mr-5 my-auto">Press enter when you're done.</p> */}
                             <Button color="success" onClick={(event) => this.addMemberDialogRef.current.submitButton.current.click()}>
-                            Done {/* <FontAwesomeIcon icon={faLevelDownAlt} rotation="90" fixedWidth border pull="right" /> */}
+                            Done {<FontAwesomeIcon icon={faLevelDownAlt} rotation="90" fixedWidth border size="xs"/>}
                             </Button>
                             <Button color="secondary" onClick={this.toggle}>Cancel</Button>
                         </ModalFooter>
