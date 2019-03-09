@@ -35,6 +35,8 @@ export default class ChangeEventDateDialog extends Component {
     handleSubmit(event) {
         event.preventDefault();
 
+        if (this === undefined) return; //TODO: better way to do this?
+
         var date = this.datePicker.current.value;
 
         var eventID = 0;

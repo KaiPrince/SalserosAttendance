@@ -2,10 +2,12 @@ import React, { Component } from 'react';
 import AddMemberDialog from './AddMemberDialog';
 import ChangeEventDateDialog from './ChangeEventDateDialog';
 import CreatableSelect from 'react-select/lib/Creatable';
-import { Container, Row, Col, Button, Table, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
+import { Container, Row, Col, Button, Table, Modal, ModalHeader, ModalBody, ModalFooter, UncontrolledTooltip } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrashAlt, faUserEdit, faCalendarDay } from '@fortawesome/free-solid-svg-icons';
 import banner from './images/Cover Logo_uncropped.jpg';
+
+import { layer, icon, counter } from '@fortawesome/fontawesome-svg-core';
 
 
 export default class SignInPage extends Component {
@@ -392,9 +394,12 @@ export default class SignInPage extends Component {
                     </Row>
                     <Row className="py-4">
                         <Col>
-                            <Button color="secondary" outline className="" onClick={() => { this.loadAllEvents(); this.ChangeEventDateModalToggle() }} >
+                            <Button color="secondary" outline className="" id="ChangeEventDateButton" onClick={() => { this.loadAllEvents(); this.ChangeEventDateModalToggle() }} >
                                 <FontAwesomeIcon icon={faCalendarDay} />
                             </Button>
+                            <UncontrolledTooltip target="ChangeEventDateButton" placement="top">
+                                Currently editing event {currentEventDate}.
+                            </UncontrolledTooltip>
                         </Col>
                         <Col md="8">
                             <Row>
@@ -416,7 +421,7 @@ export default class SignInPage extends Component {
 
 
                                 <Col sm="2">
-                                    <Button block color="primary" onClick={() => { this.handleCreate(this.state.SignInTextBoxValue) }}>Create</Button>
+                                    <Button block color="primary" onClick={() => { this.handleCreate(this.state.SignInTextBoxValue) }}>Enter</Button>
                                 </Col>
                             </Row>
 
@@ -444,7 +449,13 @@ export default class SignInPage extends Component {
                                         <tr><td colSpan="5"><p className="mx-auto text-muted">No one's here yet...</p></td></tr>
                                     }
                                     {attendingMembers.map((member, index) => <tr key={member.memberID}>
-                                        <td>{/* {this.state.memberScores.find((item) => {return item.memberID === member.memberID && item.memberScore !== 0}).memberScore} */} {member.firstName} {member.lastName}</td>
+                                        <td>
+                                            {/* {var activeMember = this.state.memberScores.find((item) => {return item.memberID === member.memberID && item.memberScore !== 0})
+                                                activeMember !== undefined &&
+                                                    activeMember.memberScore
+                                            }  */}
+                                            {member.firstName} {member.lastName}
+                                        </td>
                                         <td>{member.studentNumber}</td>
                                         <td>{member.collegeEmail}</td>
                                         <td>{member.contactEmail}</td>
