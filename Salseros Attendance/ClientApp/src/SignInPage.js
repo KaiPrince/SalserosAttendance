@@ -2,9 +2,10 @@ import React, { Component } from 'react';
 import AddMemberDialog from './AddMemberDialog';
 import ChangeEventDateDialog from './ChangeEventDateDialog';
 import CreatableSelect from 'react-select/lib/Creatable';
+import Select from 'react-select';
 import { Container, Row, Col, Button, Table, Modal, ModalHeader, ModalBody, ModalFooter, UncontrolledTooltip } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrashAlt, faUserEdit, faCalendarDay } from '@fortawesome/free-solid-svg-icons';
+import { faTrashAlt, faUserEdit, faCalendarDay, faSignInAlt, faLevelDownAlt } from '@fortawesome/free-solid-svg-icons';
 import banner from './images/Cover Logo_uncropped.jpg';
 
 import { layer, icon, counter } from '@fortawesome/fontawesome-svg-core';
@@ -407,21 +408,25 @@ export default class SignInPage extends Component {
                                     <CreatableSelect
                                         id="SignInTextBox"
                                         ref={this.SignInTextBox}
-                                        placeholder="Enter your name or student number..."
+                                        autoFocus
+                                        placeholder="What's your name?"
                                         isClearable
                                         onCreateOption={this.handleCreate}
                                         onChange={this.handleChange}
                                         onInputChange={(inputValue) => { if (inputValue !== null) this.state.SignInTextBoxLastValue = inputValue; }}
                                         options={dropdownOptions}
                                         value={this.state.SignInTextBoxValue}
-                                        formatCreateLabel={(inputValue) => { return <p className="text-danger text-decoration-none my-auto">New Member? Click here.</p> }}
+                                        formatCreateLabel={(inputValue) => { return <p className="text-muted text-decoration-none my-auto">First time here?</p> }}
+                                        noOptionsMessage={() => {return "First time here?"}}
                                         onBlur={() => { this.state.SignInTextBoxValue = this.state.SignInTextBoxLastValue; }}
                                     />
                                 </Col>
 
 
                                 <Col sm="2">
-                                    <Button block color="primary" onClick={() => { this.handleCreate(this.state.SignInTextBoxValue) }}>Enter</Button>
+                                    <Button block color="primary" onClick={() => { this.handleCreate(this.state.SignInTextBoxValue) }}>
+                                        Enter <FontAwesomeIcon icon={faSignInAlt} />
+                                    </Button>
                                 </Col>
                             </Row>
 
@@ -488,13 +493,15 @@ export default class SignInPage extends Component {
                     </Modal>
 
                     <Modal id="AddMemberModal" isOpen={this.state.showAddMemberDialog} toggle={this.toggle} /* onOpened={() => { this.addMemberDialogRef.current.focusInputElement() }} */>
-                        <ModalHeader toggle={this.toggle}>Add new member</ModalHeader>
+                        <ModalHeader toggle={this.toggle}>New Member</ModalHeader>
                         <ModalBody>
                             <AddMemberDialog {...this.state.memberToAdd} ref={this.addMemberDialogRef} handleAddMember={this.addMember} />
                         </ModalBody>
                         <ModalFooter>
-                            <p className="text-muted font-weight-light text-left mr-5 my-auto">Press enter when you're done.</p>
-                            <Button color="primary" onClick={(event) => this.addMemberDialogRef.current.submitButton.current.click()}>Done</Button>
+                            {/* <p className="text-muted font-weight-light text-left mr-5 my-auto">Press enter when you're done.</p> */}
+                            <Button color="success" onClick={(event) => this.addMemberDialogRef.current.submitButton.current.click()}>
+                            Done {/* <FontAwesomeIcon icon={faLevelDownAlt} rotation="90" fixedWidth border pull="right" /> */}
+                            </Button>
                             <Button color="secondary" onClick={this.toggle}>Cancel</Button>
                         </ModalFooter>
                     </Modal>
