@@ -161,6 +161,8 @@ export default class AddMemberDialog extends Component {
                                     </InputGroup>
                                 </FormGroup>
                             </Col>
+                        </Row>
+                        <Row form>
                             <Col>
                                 <FormGroup>
                                     <InputGroup size="sm">
@@ -187,6 +189,8 @@ export default class AddMemberDialog extends Component {
                                     </Popover>
                                 </FormGroup>
                             </Col>
+                        </Row>
+                        <Row form>
                             <Col>
                                 <FormGroup>
                                     <InputGroup size="sm">
