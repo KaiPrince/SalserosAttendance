@@ -396,7 +396,7 @@ export default class SignInPage extends Component {
         return (
             <div id="SignInPage" className="">
                 <Container fluid>
-                <Row>
+                    <Row>
                         <Col></Col>
                         <Col md="8">
                             <br></br><br></br><br></br>
@@ -408,14 +408,14 @@ export default class SignInPage extends Component {
                         <Col md="8">
                             {/* <img src={banner} className="img-fluid rounded" alt="Conestoga Salseros" /> */}
                             <h1 className="display-4">Attendance List</h1>
-                            <h3>Sign in for today's lesson in the bar below.</h3>
+                            <p className="lead">Sign in for today's lesson in the bar below.</p>
                             {/* {this.state.event !== null ? this.state.event.title : "Salseros Attendance"} */}
                         </Col>
                         <Col></Col>
                     </Row>
                     <Row className="py-4">
                         <Col>
-                            <Button color="secondary" outline className="" id="ChangeEventDateButton" onClick={() => { this.loadAllEvents(); this.ChangeEventDateModalToggle() }} >
+                            <Button color="secondary" outline className="float-right" id="ChangeEventDateButton" onClick={() => { this.loadAllEvents(); this.ChangeEventDateModalToggle() }} >
                                 <FontAwesomeIcon icon={faCalendarDay} />
                             </Button>
                             <UncontrolledTooltip target="ChangeEventDateButton" placement="top">
@@ -427,6 +427,8 @@ export default class SignInPage extends Component {
                                 <Col >
                                     <CreatableSelect
                                         id="SignInTextBox"
+                                        className="border border-dark shadow-sm rounded"
+
                                         ref={this.SignInTextBox}
                                         autoFocus
                                         placeholder="What's your name?"
@@ -458,16 +460,20 @@ export default class SignInPage extends Component {
                             {/* There could be a streaks or high scores widget here */}
                         </Col>
                     </Row>
-                    <Row>
+                    <Row className="pt-5">
                         <Col></Col>
                         <Col  md="8">
+                            {(this.state.attendanceList.length !== 0) &&
+                            <p className="mx-auto text-muted">There are {this.state.attendanceList.length} members in attendance.</p>
+                            }
+                            <div className="border border-light rounded">
                             <Table responsive>
                                 <thead>
                                     <tr>
-                                        <th>Name</th>
-                                        <th>Student #</th>
-                                        <th>College Email</th>
-                                        <th>Contact Email</th>
+                                        <th className="text-muted font-weight-normal">Name</th>
+                                        <th className="text-muted font-weight-normal">Student #</th>
+                                        <th className="text-muted font-weight-normal">College Email</th>
+                                        <th className="text-muted font-weight-normal">Contact Email</th>
                                         <th></th>
                                     </tr>
                                 </thead>
@@ -488,9 +494,9 @@ export default class SignInPage extends Component {
                                                 </Fade>
                                             } */}
                                         </td>
-                                        <td>{member.studentNumber}</td>
-                                        <td>{member.collegeEmail}</td>
-                                        <td>{member.contactEmail}</td>
+                                        <td className="text-muted font-weight-light">{member.studentNumber}</td>
+                                        <td className="text-muted font-weight-light">{member.collegeEmail}</td>
+                                        <td className="text-muted font-weight-light">{member.contactEmail}</td>
                                         <td>
                                             {/* <Button outline color="secondary" size="sm" >
                                                 <FontAwesomeIcon icon={faUserEdit} fixedWidth />
@@ -502,10 +508,7 @@ export default class SignInPage extends Component {
                                     </tr>
                                     )}
                                 </tbody>
-                            </Table>
-                            {(this.state.attendanceList.length !== 0) &&
-                            <p className="mx-auto text-muted">There are {this.state.attendanceList.length} members in attendance.</p>
-                            }
+                            </Table></div>
                         </Col>
                         <Col></Col>
                     </Row>
