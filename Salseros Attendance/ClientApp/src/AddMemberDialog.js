@@ -153,7 +153,9 @@ export default class AddMemberDialog extends Component {
                 <Container>
                     <Form onSubmit={this.handleSubmit} >
                         <Row form>
-                            <Col>
+                        <Col></Col>
+                            <Col md="9">
+                            <br></br>
                                 <FormGroup>
                                     <InputGroup size="sm">
                                         <InputGroupAddon addonType="prepend">First Name:</InputGroupAddon>
@@ -161,9 +163,11 @@ export default class AddMemberDialog extends Component {
                                     </InputGroup>
                                 </FormGroup>
                             </Col>
+                            <Col></Col>
                         </Row>
                         <Row form>
-                            <Col>
+                        <Col></Col>
+                            <Col md="9">
                                 <FormGroup>
                                     <InputGroup size="sm">
                                         <InputGroupAddon addonType="prepend">Last Name:</InputGroupAddon>
@@ -171,9 +175,11 @@ export default class AddMemberDialog extends Component {
                                     </InputGroup>
                                 </FormGroup>
                             </Col>
+                            <Col></Col>
                         </Row>
                         <Row form>
-                            <Col>
+                        <Col></Col>
+                            <Col md="9">
                                 <FormGroup>
                                     <InputGroup size="sm" className="pb-4"> {/* Bottom padding makes room for popover. */}
                                         <InputGroupAddon addonType="prepend">Student ID:</InputGroupAddon>
@@ -189,25 +195,32 @@ export default class AddMemberDialog extends Component {
                                     </Popover>
                                 </FormGroup>
                             </Col>
+                            <Col></Col>
                         </Row>
                         <Row form>
                             <Col>
+                            </Col>
+                            <Col md="9">
                                 <FormGroup>
                                     <InputGroup size="sm">
-                                        <InputGroupAddon addonType="prepend">
+                                        {/* <InputGroupAddon addonType="prepend">
                                             <UncontrolledTooltip target="btnCollegeEmail" trigger="hover focus" placement="auto" >Click to generate.</UncontrolledTooltip>
                                             <Button id="btnCollegeEmail" onClick={this.handleGenerateCollegeEmail}>College Email:</Button>
-                                        </InputGroupAddon>
-                                        <Input name="collegeEmail" placeholder="College Email" innerRef={this.collegeEmailTextBox} type="text" value={this.state.collegeEmail} onChange={this.handleInputChange} required disabled={this.isCollegeEmailDisabled()} />
-                                        {/* <InputGroupAddon addonType="append">@conestogac.on.ca</InputGroupAddon> */}
+                                        </InputGroupAddon> */}
+                                        <Input name="collegeEmail" className="text-right border-right-0" placeholder="College Email" innerRef={this.collegeEmailTextBox} type="text" value={this.state.collegeEmail} onChange={this.handleInputChange} required /* disabled={this.isCollegeEmailDisabled()} */ />
+                                        <InputGroupAddon addonType="append"> <span className="input-group-text bg-light border rounded-right text-muted font-weight-light">@conestogac.on.ca</span> </InputGroupAddon>
                                     </InputGroup>
                                 </FormGroup>
+                            </Col>
+                            <Col>
                             </Col>
                         </Row>
                         <Row form>
                             <Col>
-                                <Button color="link text-secondary text-decoration-none" id="btnExtraOptionsToggle" onClick={() => { this.setState({ isExtraOptionsCollapseOpen: !this.state.isExtraOptionsCollapseOpen }); }}>
-                                    {!this.state.isExtraOptionsCollapseOpen ? "More" : "Less"} <FontAwesomeIcon icon={!this.state.isExtraOptionsCollapseOpen ? faAngleDoubleDown : faAngleDoubleUp} size="xs" />
+                            </Col>
+                            <Col md="9">
+                                <Button size="sm" color="link text-secondary text-decoration-none" id="btnExtraOptionsToggle" onClick={() => { this.setState({ isExtraOptionsCollapseOpen: !this.state.isExtraOptionsCollapseOpen }); }}>
+                                    {!this.state.isExtraOptionsCollapseOpen ? "Choose Personal Email" : "Less"} <FontAwesomeIcon icon={!this.state.isExtraOptionsCollapseOpen ? faAngleDoubleDown : faAngleDoubleUp} size="xs" />
                                 </Button>
                                 <Collapse isOpen={this.state.isExtraOptionsCollapseOpen}>
                                     <FormGroup>
@@ -224,6 +237,7 @@ export default class AddMemberDialog extends Component {
                                     </FormGroup>
                                 </Collapse>
                             </Col>
+                            <Col></Col>
                         </Row>
 
 

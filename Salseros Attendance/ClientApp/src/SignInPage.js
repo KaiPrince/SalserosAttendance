@@ -3,7 +3,7 @@ import AddMemberDialog from './AddMemberDialog';
 import ChangeEventDateDialog from './ChangeEventDateDialog';
 import CreatableSelect from 'react-select/lib/Creatable';
 import Select from 'react-select';
-import { Container, Row, Col, Button, Table, Modal, ModalHeader, ModalBody, ModalFooter, UncontrolledTooltip } from 'reactstrap';
+import { Container, Row, Col, Button, Table, Modal, ModalHeader, ModalBody, ModalFooter, UncontrolledTooltip, Badge, Fade } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrashAlt, faUserEdit, faCalendarDay, faSignInAlt, faLevelDownAlt } from '@fortawesome/free-solid-svg-icons';
 import banner from './images/Cover Logo_uncropped.jpg';
@@ -27,6 +27,8 @@ export default class SignInPage extends Component {
             allEvents: null,
             willCreateNewEvent: false,
             memberScores: [],
+            memberSigningIn: null,
+            signInSuccessBadgeFadeToggle: true,
         };
 
         this.SignInTextBox = React.createRef();
@@ -208,6 +210,17 @@ export default class SignInPage extends Component {
                 );
         }
 
+        //TODO: this is horrible coupling. Use redux.
+        //Dismiss Sign in success badge after a timeout
+        const kSuccessBadgeFadeToggle = 5000;
+        await this.setState({signInSuccessBadgeFadeToggle: true});
+        let oldSignInMember = this.state.memberSigningIn;
+        setTimeout(() => {
+            if (oldSignInMember === this.state.memberSigningIn) {
+            this.setState({signInSuccessBadgeFadeToggle: false})
+            }
+        }, kSuccessBadgeFadeToggle);
+
     }
 
     async loadAllMemberScores() {
@@ -255,6 +268,8 @@ export default class SignInPage extends Component {
     }
 
     async addMemberToAttendance(eventID, memberID) {
+        this.setState({ memberSigningIn: memberID});
+
         let messageBody = JSON.stringify({ EventID: eventID, MemberID: memberID, Time: new Date() });
         console.log(messageBody);
 
@@ -342,11 +357,6 @@ export default class SignInPage extends Component {
             this.setState({ memberToAdd: { firstName: parsedfirstName, lastName: parsedlastName, studentNumber: parsedstudentID } });
             this.setState({ showAddMemberDialog: true });
         }
-
-
-
-
-
     };
 
     toggle() {
@@ -386,12 +396,22 @@ export default class SignInPage extends Component {
         return (
             <div id="SignInPage" className="">
                 <Container fluid>
+                <Row>
+                        <Col></Col>
+                        <Col md="8">
+                            <br></br><br></br><br></br>
+                        </Col>
+                        <Col></Col>
+                    </Row>
                     <Row>
-                        <Col>
-                            {/* <h1 className="display-4">Sign-in Page</h1> */}
-                            <img src={banner} className="img-fluid rounded" alt="Conestoga Salseros" />
+                        <Col></Col>
+                        <Col md="8">
+                            {/* <img src={banner} className="img-fluid rounded" alt="Conestoga Salseros" /> */}
+                            <h1 className="display-4">Attendance List</h1>
+                            <h3>Sign in for today's lesson in the bar below.</h3>
                             {/* {this.state.event !== null ? this.state.event.title : "Salseros Attendance"} */}
                         </Col>
+                        <Col></Col>
                     </Row>
                     <Row className="py-4">
                         <Col>
@@ -411,13 +431,14 @@ export default class SignInPage extends Component {
                                         autoFocus
                                         placeholder="What's your name?"
                                         isClearable
+                                        blurInputOnSelect={false}
                                         onCreateOption={this.handleCreate}
                                         onChange={this.handleChange}
                                         onInputChange={(inputValue) => { if (inputValue !== null) this.state.SignInTextBoxLastValue = inputValue; }}
                                         options={dropdownOptions}
                                         value={this.state.SignInTextBoxValue}
                                         formatCreateLabel={(inputValue) => { return <p className="text-muted text-decoration-none my-auto">First time here?</p> }}
-                                        noOptionsMessage={() => {return "First time here?"}}
+                                        /* noOptionsMessage={() => {return "First time here?"}} */
                                         onBlur={() => { this.state.SignInTextBoxValue = this.state.SignInTextBoxLastValue; }}
                                     />
                                 </Col>
@@ -438,7 +459,8 @@ export default class SignInPage extends Component {
                         </Col>
                     </Row>
                     <Row>
-                        <Col>
+                        <Col></Col>
+                        <Col  md="8">
                             <Table responsive>
                                 <thead>
                                     <tr>
@@ -454,12 +476,17 @@ export default class SignInPage extends Component {
                                         <tr><td colSpan="5"><p className="mx-auto text-muted">No one's here yet...</p></td></tr>
                                     }
                                     {attendingMembers.map((member, index) => <tr key={member.memberID}>
-                                        <td>
+                                        <td className="no-wrap text-nowrap flex-nowrap">
                                             {/* {var activeMember = this.state.memberScores.find((item) => {return item.memberID === member.memberID && item.memberScore !== 0})
                                                 activeMember !== undefined &&
                                                     activeMember.memberScore
                                             }  */}
                                             {member.firstName} {member.lastName}
+                                            {/* {index === 0 && member.memberID === this.state.memberSigningIn &&
+                                                <Fade in={this.state.signInSuccessBadgeFadeToggle}>
+                                                    <Badge color="success" >Thank You!</Badge>
+                                                </Fade>
+                                            } */}
                                         </td>
                                         <td>{member.studentNumber}</td>
                                         <td>{member.collegeEmail}</td>
@@ -476,7 +503,11 @@ export default class SignInPage extends Component {
                                     )}
                                 </tbody>
                             </Table>
+                            {(this.state.attendanceList.length !== 0) &&
+                            <p className="mx-auto text-muted">There are {this.state.attendanceList.length} members in attendance.</p>
+                            }
                         </Col>
+                        <Col></Col>
                     </Row>
                 </Container>
                 <div id="allModals" >
@@ -493,14 +524,14 @@ export default class SignInPage extends Component {
                     </Modal>
 
                     <Modal id="AddMemberModal" isOpen={this.state.showAddMemberDialog} toggle={this.toggle} /* onOpened={() => { this.addMemberDialogRef.current.focusInputElement() }} */>
-                        <ModalHeader toggle={this.toggle}>New Member</ModalHeader>
+                        <ModalHeader className="bg-success text-white" toggle={this.toggle}>New Member</ModalHeader>
                         <ModalBody>
                             <AddMemberDialog {...this.state.memberToAdd} ref={this.addMemberDialogRef} handleAddMember={this.addMember} />
                         </ModalBody>
                         <ModalFooter>
                             {/* <p className="text-muted font-weight-light text-left mr-5 my-auto">Press enter when you're done.</p> */}
                             <Button color="success" onClick={(event) => this.addMemberDialogRef.current.submitButton.current.click()}>
-                            Done {<FontAwesomeIcon icon={faLevelDownAlt} rotation="90" fixedWidth border size="xs"/>}
+                            Done {/* <FontAwesomeIcon icon={faLevelDownAlt} rotation={90} fixedWidth border size="xs"/> */}
                             </Button>
                             <Button color="secondary" onClick={this.toggle}>Cancel</Button>
                         </ModalFooter>

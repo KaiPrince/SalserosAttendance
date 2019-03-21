@@ -1,6 +1,3 @@
-- Add colour and Logo
-- Regenerate conestoga email regardless of sequence of inputs
-- Add enter button to search box (or GO)
 - Edit button for members (pencil icon)
 - Change Typeface.
 - Ask user for verification that first and last names parsed correctly if there are 3 or more words.
@@ -11,9 +8,13 @@
 - Add success alert when a member attendance is added.
 
 - Add prompt before creating a new event for new today.
-- Add editing of member info
 - Refactor to use Redux
 - Add support for more than one event in a day.
-- FIX: double clicking the Add new member create button causes the modal to disappear (& crash)
 - Add validation to AddMemberDialog
-- Add tooltip popup that says "Press enter when you're done" to AddMemberDialog near Done button.
+- Make sure cursor appears after focusing on inputbox
+
+Bugs List:
+- allEvents === null when changing date
+- double clicking the Add new member create button causes the modal to disappear (& crash)
+- don't allow hyphens or other bad characters in school email.
+- Fix capitalization logic in Controller (currently copies, rather than edits.)
