@@ -93,7 +93,7 @@ export default class AddMemberDialog extends Component {
         if (this.hasValidInputsForGenerateCollegeEmail(this.state)) {
 
             this.setState({
-                collegeEmail: this.state.firstName[0] + this.state.lastName.replace(/\s+/g, '') + this.state.studentNumber.slice(-4) + "@conestogac.on.ca",
+                collegeEmail: this.state.firstName[0] + this.state.lastName.replace(/[^a-zA-z]+/g, '') + this.state.studentNumber.slice(-4),
             });
         }
 
@@ -138,7 +138,7 @@ export default class AddMemberDialog extends Component {
             FirstName: this.state.firstName,
             LastName: this.state.lastName,
             StudentNumber: this.state.studentNumber,
-            CollegeEmail: this.state.collegeEmail,
+            CollegeEmail: this.state.collegeEmail + "@conestogac.on.ca",
             ContactEmail: this.state.contactEmail,
             PhoneNumber: this.state.phoneNumber,
         };

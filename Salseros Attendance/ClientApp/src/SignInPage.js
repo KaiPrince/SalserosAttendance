@@ -424,7 +424,7 @@ export default class SignInPage extends Component {
                                 <Col >
                                     <CreatableSelect
                                         id="SignInTextBox"
-                                        className="border border-dark shadow-sm rounded"
+                                        className="border border-dark shadow rounded"
 
                                         ref={this.SignInTextBox}
                                         autoFocus
@@ -464,11 +464,11 @@ export default class SignInPage extends Component {
                             <p className="mx-auto text-muted">There are {this.state.attendanceList.length} members in attendance.</p>
                             }
                             <div className="border border-light rounded">
-                            <Table responsive>
+                            <Table >
                                 <thead>
                                     <tr>
                                         <th className="text-muted font-weight-normal">Name</th>
-                                        <th className="text-muted font-weight-normal">Student #</th>
+                                        <th className="text-muted font-weight-normal text-nowrap">Student #</th>
                                         <th className="text-muted font-weight-normal">College Email</th>
                                         <th className="text-muted font-weight-normal">Contact Email</th>
                                         <th></th>
