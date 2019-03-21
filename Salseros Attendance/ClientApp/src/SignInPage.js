@@ -8,6 +8,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrashAlt, faUserEdit, faCalendarDay, faSignInAlt, faLevelDownAlt } from '@fortawesome/free-solid-svg-icons';
 import banner from './images/Cover Logo_uncropped.jpg';
 
+import { toast } from 'react-toastify';
+
 import { layer, icon, counter } from '@fortawesome/fontawesome-svg-core';
 
 
@@ -27,8 +29,7 @@ export default class SignInPage extends Component {
             allEvents: null,
             willCreateNewEvent: false,
             memberScores: [],
-            memberSigningIn: null,
-            signInSuccessBadgeFadeToggle: true,
+            memberSigningIn: null
         };
 
         this.SignInTextBox = React.createRef();
@@ -210,17 +211,6 @@ export default class SignInPage extends Component {
                 );
         }
 
-        //TODO: this is horrible coupling. Use redux.
-        //Dismiss Sign in success badge after a timeout
-        const kSuccessBadgeFadeToggle = 5000;
-        await this.setState({signInSuccessBadgeFadeToggle: true});
-        let oldSignInMember = this.state.memberSigningIn;
-        setTimeout(() => {
-            if (oldSignInMember === this.state.memberSigningIn) {
-            this.setState({signInSuccessBadgeFadeToggle: false})
-            }
-        }, kSuccessBadgeFadeToggle);
-
     }
 
     async loadAllMemberScores() {
@@ -385,6 +375,13 @@ export default class SignInPage extends Component {
             }
         });
 
+        
+        if (this.state.attendanceList[0] === this.state.memberSigningIn)
+        {
+            toast.success(`Thanks ${this.state.membersList.find(member => member.memberID === this.state.memberSigningIn).firstName}!`);
+        }
+        
+
         //TODO: find a better way to do this, or make a function.
         function yyyymmdd(date) {
             function twoDigit(n) { return (n < 10 ? '0' : '') + n; }
@@ -488,11 +485,6 @@ export default class SignInPage extends Component {
                                                     activeMember.memberScore
                                             }  */}
                                             {member.firstName} {member.lastName}
-                                            {/* {index === 0 && member.memberID === this.state.memberSigningIn &&
-                                                <Fade in={this.state.signInSuccessBadgeFadeToggle}>
-                                                    <Badge color="success" >Thank You!</Badge>
-                                                </Fade>
-                                            } */}
                                         </td>
                                         <td className="text-muted font-weight-light">{member.studentNumber}</td>
                                         <td className="text-muted font-weight-light">{member.collegeEmail}</td>
