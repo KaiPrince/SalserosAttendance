@@ -29,7 +29,8 @@ export default class SignInPage extends Component {
             allEvents: null,
             willCreateNewEvent: false,
             memberScores: [],
-            memberSigningIn: null
+            memberSigningIn: null,
+            willShowSignInThanks: false,
         };
 
         this.SignInTextBox = React.createRef();
@@ -258,7 +259,7 @@ export default class SignInPage extends Component {
     }
 
     async addMemberToAttendance(eventID, memberID) {
-        this.setState({ memberSigningIn: memberID});
+        this.setState({ memberSigningIn: memberID, willShowSignInThanks: true});
 
         let messageBody = JSON.stringify({ EventID: eventID, MemberID: memberID, Time: new Date() });
         console.log(messageBody);
@@ -376,9 +377,11 @@ export default class SignInPage extends Component {
         });
 
         
-        if (this.state.attendanceList[0] === this.state.memberSigningIn)
+        if (this.state.attendanceList[0] === this.state.memberSigningIn && this.state.willShowSignInThanks)
         {
             toast.success(`Thanks ${this.state.membersList.find(member => member.memberID === this.state.memberSigningIn).firstName}!`);
+
+            this.setState({willShowSignInThanks: false});
         }
         
 
